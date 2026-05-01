@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<key>NSCameraUsageDescription</key>
+    <string>SewSafe needs camera access to capture fabric and style details.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>SewSafe needs gallery access to upload reference images.</string>
+
 </dict>
 </plist>
