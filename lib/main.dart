@@ -1,11 +1,11 @@
+// ignore: depend_on_referenced_packages
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
+import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/theme/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,18 +34,20 @@ void main() async {
   );
 }
 
-class SewSafeMobile extends StatelessWidget {
+class SewSafeMobile extends ConsumerWidget {
   const SewSafeMobile({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(goRouterProvider);
+
+    return MaterialApp.router(
       title: "SewSafe",
       debugShowCheckedModeBanner: false,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
       theme: AppTheme.lightTheme,
-      home: const Scaffold(body: Center(child: Text('SewSafe Mobile Loaded Successfully!'),),),
+      routerConfig: router,
       // theme: ThemeData(
       //   useMaterial3: true,
       //   textTheme: GoogleFonts.playfairDisplayTextTheme(),
