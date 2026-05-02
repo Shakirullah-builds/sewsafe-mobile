@@ -6,6 +6,8 @@ import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
       useMaterial3: true,
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.backgroundLight,
