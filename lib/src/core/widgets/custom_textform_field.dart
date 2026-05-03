@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
+import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -11,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final int maxLines;
   final int? maxLength;
   final bool readOnly;
+  final String headerText;
 
   const CustomTextField({
     super.key,
@@ -24,28 +29,46 @@ class CustomTextField extends StatelessWidget {
     this.maxLines = 1,
     this.maxLength,
     this.readOnly = false,
+    required this.headerText,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      validator: validator,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      maxLines: obscureText ? 1 : maxLines, // Passwords must be 1 line
-      maxLength: maxLength,
-      readOnly: readOnly,
-      // Automatically uses the base font from AppTheme!
-      style: Theme.of(context).textTheme.bodyLarge, 
-      decoration: InputDecoration(
-        hintText: hintText,
-        suffixIcon: suffixIcon,
-        prefixIcon: prefixIcon,
-        // Notice we DO NOT define borders, fill colors, or padding here.
-        // Flutter will automatically reach into your AppTheme and apply 
-        // the perfect inputDecorationTheme you already wrote!
-      ),
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomText(
+          headerText,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontSize: 14.spMin,
+            fontFamily: GoogleFonts.lato().fontFamily,
+            color: AppColors.textTertiaryLight,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        5.verticalSpace,
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          keyboardType: keyboardType,
+          obscureText: obscureText,
+          maxLines: obscureText ? 1 : maxLines, // Passwords must be 1 line
+          maxLength: maxLength,
+          readOnly: readOnly,
+          // Automatically uses the base font from AppTheme!
+          style: theme.inputDecorationTheme.labelStyle,
+          decoration: InputDecoration(
+            hintStyle: theme.inputDecorationTheme.hintStyle,
+            hintText: hintText,
+            suffixIcon: suffixIcon,
+            prefixIcon: prefixIcon,
+            // Notice we DO NOT define borders, fill colors, or padding here.
+            // Flutter will automatically reach into your AppTheme and apply 
+            // the perfect inputDecorationTheme you already wrote!
+          ),
+        ),
+      ],
     );
   }
 }

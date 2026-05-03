@@ -17,30 +17,31 @@ class AppTheme {
         secondary: AppColors.secondary,
         error: AppColors.error,
         surface: AppColors.surfaceLight,
+        onSurface: AppColors.surfaceDark200,
       ),
       textTheme: GoogleFonts.interTextTheme().copyWith(
         displayLarge: GoogleFonts.playfairDisplay(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.textTertiaryLight,
           fontSize: 57.sp,
           fontWeight: FontWeight.w400,
         ),
         displayMedium: GoogleFonts.playfairDisplay(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.textTertiaryLight,
           fontSize: 45.sp,
           fontWeight: FontWeight.w400,
         ),
         headlineLarge: GoogleFonts.playfairDisplay(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.textTertiaryLight,
           fontSize: 32.sp,
           fontWeight: FontWeight.w400,
         ),
         titleLarge: GoogleFonts.playfairDisplay(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.textTertiaryLight,
           fontSize: 22.sp,
           fontWeight: FontWeight.w400,
         ),
         displaySmall: TextStyle(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.textTertiaryLight,
           fontSize: 36.sp,
           fontWeight: FontWeight.w400,
         ),
@@ -50,7 +51,7 @@ class AppTheme {
           fontWeight: FontWeight.w400,
         ),
         headlineSmall: TextStyle(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.textTertiaryLight,
           fontSize: 24.sp,
           fontWeight: FontWeight.w400,
         ),
@@ -73,16 +74,34 @@ class AppTheme {
           padding: EdgeInsets.symmetric(vertical: 16.h),
         ),
       ),
+      //outlinedButtonTheme: ,
       inputDecorationTheme: InputDecorationTheme(
+        contentPadding: EdgeInsets.all(20.r),
         filled: true,
+        labelStyle: TextStyle(
+          fontSize: 16.spMin,
+          color: AppColors.surfaceDark200,
+          fontWeight: FontWeight.normal,
+          fontFamily: GoogleFonts.lato().fontFamily,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 16.spMin,
+          color: AppColors.surfaceDark200,
+          fontWeight: FontWeight.normal,
+          fontFamily: GoogleFonts.lato().fontFamily,
+        ),
         fillColor: AppColors.surfaceLight,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: const BorderSide(color: AppColors.textSecondaryLight),
+          borderRadius: BorderRadius.circular(20.r),
+          borderSide: BorderSide(color: AppColors.primarySoft, width: 2.w),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20.r),
+          borderSide: BorderSide(color: AppColors.primarySoft, width: 2.w),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.primary, width: 2.w),
+          borderRadius: BorderRadius.circular(20.r),
+          borderSide: BorderSide(color: AppColors.primarySoft, width: 2.w),
         ),
       ),
     );

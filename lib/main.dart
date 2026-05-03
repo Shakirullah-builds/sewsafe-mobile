@@ -22,14 +22,16 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  DevicePreview(
-    tools: const [...DevicePreview.defaultTools],
-    enabled: !kReleaseMode,
-    builder: (context) => ScreenUtilInit(
-      designSize: Size(430.w, 932.h),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) => const ProviderScope(child: SewSafeMobile()),
+  runApp(
+    DevicePreview(
+      tools: const [...DevicePreview.defaultTools],
+      enabled: !kReleaseMode,
+      builder: (context) => ScreenUtilInit(
+        designSize: const Size(430, 932),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) => const ProviderScope(child: SewSafeMobile()),
+      ),
     ),
   );
 }
@@ -54,6 +56,7 @@ class SewSafeMobile extends ConsumerWidget {
       //   primaryColor: AppColors.primary,
       // ),
     );
+
   
   }
 }
