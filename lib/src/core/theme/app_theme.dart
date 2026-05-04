@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
@@ -15,6 +16,7 @@ class AppTheme {
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
+        onTertiary: AppColors.textTertiaryDark,
         error: AppColors.error,
         surface: AppColors.surfaceLight,
         onSurface: AppColors.surfaceDark200,
@@ -59,7 +61,7 @@ class AppTheme {
         titleSmall: const TextStyle(color: AppColors.textPrimaryLight),
         bodyLarge: const TextStyle(color: AppColors.textPrimaryLight),
         bodyMedium: const TextStyle(color: AppColors.textPrimaryLight),
-        bodySmall: const TextStyle(color: AppColors.textPrimaryLight,),
+        bodySmall: const TextStyle(color: AppColors.textPrimaryLight),
         labelLarge: const TextStyle(color: AppColors.textPrimaryLight),
         labelMedium: const TextStyle(color: AppColors.textPrimaryLight),
         labelSmall: const TextStyle(color: AppColors.textPrimaryLight),
@@ -111,17 +113,22 @@ class AppTheme {
       ),
 
       appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.backgroundLight,
-      foregroundColor: AppColors.textTertiaryDark, // Dark text/icons on white app bar
-      centerTitle: true,
-      elevation: 0,
-      iconTheme: IconThemeData(color: AppColors.background, size: 24.spMin),
-      systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
+        backgroundColor: AppColors.backgroundLight,
+        foregroundColor:
+            AppColors.textTertiaryDark, // Dark text/icons on white app bar
+        centerTitle: true,
+        //elevation: 10,
+        titleTextStyle: TextStyle(
+          color: AppColors.textTertiaryDark,
+          fontSize: 18.spMin,
+          fontWeight: FontWeight.w800,
+          fontFamily: GoogleFonts.playfairDisplay().fontFamily,
+        ),
+        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
+          statusBarColor: Colors.transparent,
+        ),
       ),
-    ),
     );
-    
   }
 
   // You can easily duplicate the above logic for darkTheme later!

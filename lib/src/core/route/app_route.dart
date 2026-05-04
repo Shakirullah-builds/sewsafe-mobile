@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sewsafe_mobile/src/features/auth/presentation/screens/auth/auth.dart';
+import 'package:sewsafe_mobile/src/features/auth/presentation/screens/auth/forgot_password.dart';
 
 // 1. Route Enums: You will never type a raw string like '/home' again.
-enum AppRoute { splash, onboarding, login, signup, home, addClient }
+enum AppRoute { splash, onboarding, login, signup, home, addClient, forgotPassword }
 
 // 2. The Router Provider
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -52,6 +53,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const Scaffold(
           body: Center(child: Text('Home Screen Setup')), // Placeholder
         ),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: AppRoute.forgotPassword.name,
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
     ],
   );

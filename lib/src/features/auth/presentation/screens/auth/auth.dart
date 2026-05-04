@@ -2,9 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_icons.dart';
+import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_svg.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
@@ -161,7 +163,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                         alignment: Alignment.centerRight,
                                         child: CustomButton.text(
                                           text: 'Forgot password?',
-                                          onPressed: () {},
+                                          onPressed: () => context.pushNamed(
+                                            AppRoute.forgotPassword.name,
+                                          ),
                                           buttonTextFontSize: 13.spMin,
                                         ),
                                       ),
