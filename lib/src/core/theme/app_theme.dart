@@ -59,7 +59,7 @@ class AppTheme {
         titleSmall: const TextStyle(color: AppColors.textPrimaryLight),
         bodyLarge: const TextStyle(color: AppColors.textPrimaryLight),
         bodyMedium: const TextStyle(color: AppColors.textPrimaryLight),
-        bodySmall: const TextStyle(color: AppColors.textPrimaryLight),
+        bodySmall: const TextStyle(color: AppColors.textPrimaryLight,),
         labelLarge: const TextStyle(color: AppColors.textPrimaryLight),
         labelMedium: const TextStyle(color: AppColors.textPrimaryLight),
         labelSmall: const TextStyle(color: AppColors.textPrimaryLight),
@@ -104,7 +104,24 @@ class AppTheme {
           borderSide: BorderSide(color: AppColors.primarySoft, width: 2.w),
         ),
       ),
+      dividerTheme: DividerThemeData(
+        color: AppColors.surfaceDark200,
+        thickness: 0.2.w,
+        //space: 16.w,
+      ),
+
+      appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.backgroundLight,
+      foregroundColor: AppColors.textTertiaryDark, // Dark text/icons on white app bar
+      centerTitle: true,
+      elevation: 0,
+      iconTheme: IconThemeData(color: AppColors.background, size: 24.spMin),
+      systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    ),
     );
+    
   }
 
   // You can easily duplicate the above logic for darkTheme later!

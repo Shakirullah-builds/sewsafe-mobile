@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sewsafe_mobile/src/features/auth/presentation/screens/auth_screens.dart';
+import 'package:sewsafe_mobile/src/features/auth/presentation/screens/auth/auth.dart';
 
 // 1. Route Enums: You will never type a raw string like '/home' again.
 enum AppRoute { splash, onboarding, login, signup, home, addClient }
@@ -44,7 +44,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signup',
         name: AppRoute.signup.name,
-        builder: (context, state) => const AuthScreens(),
+        builder: (context, state) => const AuthScreen(),
       ),
       GoRoute(
         path: '/home',
