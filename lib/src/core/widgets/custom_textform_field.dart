@@ -15,7 +15,7 @@ class CustomTextField extends StatelessWidget {
   final int maxLines;
   final int? maxLength;
   final bool readOnly;
-  final String headerText;
+  final String? headerText;
 
   const CustomTextField({
     super.key,
@@ -29,7 +29,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLines = 1,
     this.maxLength,
     this.readOnly = false,
-    required this.headerText,
+    this.headerText,
   });
 
   @override
@@ -39,7 +39,7 @@ class CustomTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomText(
-          headerText,
+          headerText ?? '',
           style: theme.textTheme.bodyLarge?.copyWith(
             fontSize: 14.spMin,
             fontFamily: GoogleFonts.lato().fontFamily,

@@ -17,6 +17,7 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         onTertiary: AppColors.textTertiaryDark,
+        onSecondary: AppColors.textSecondaryDark,
         error: AppColors.error,
         surface: AppColors.surfaceLight,
         onSurface: AppColors.surfaceDark200,
@@ -88,7 +89,7 @@ class AppTheme {
         ),
         hintStyle: TextStyle(
           fontSize: 16.spMin,
-          color: AppColors.surfaceDark200,
+          color: AppColors.textSecondaryDark,
           fontWeight: FontWeight.normal,
           fontFamily: GoogleFonts.lato().fontFamily,
         ),
@@ -105,6 +106,8 @@ class AppTheme {
           borderRadius: BorderRadius.circular(20.r),
           borderSide: BorderSide(color: AppColors.primarySoft, width: 2.w),
         ),
+        prefixIconColor: AppColors.textTertiaryDark.withValues(alpha: 0.7),
+        suffixIconColor: AppColors.textTertiaryDark,
       ),
       dividerTheme: DividerThemeData(
         color: AppColors.surfaceDark200,
@@ -128,6 +131,16 @@ class AppTheme {
           statusBarColor: Colors.transparent,
         ),
       ),
+      // iconButtonTheme: IconButtonThemeData(
+      //   style: IconButton.styleFrom(
+      //     foregroundColor: AppColors.textSecondaryDark,
+      //     iconSize: 24.spMin,
+      //     minimumSize: Size.zero,
+      //     padding: EdgeInsets.zero,
+
+
+      //   ),
+      // ),
     );
   }
 

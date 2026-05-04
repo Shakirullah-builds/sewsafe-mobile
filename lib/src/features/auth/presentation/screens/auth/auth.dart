@@ -121,7 +121,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             obscureText: true,
                             suffixIcon: Icon(
                               Icons.visibility_off,
-                              color: theme.colorScheme.onSurface,
+                              color: theme.colorScheme.onSecondary,
                             ),
                             headerText: 'Password',
                           ),
@@ -144,7 +144,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                         obscureText: true,
                                         suffixIcon: Icon(
                                           Icons.visibility_off,
-                                          color: theme.colorScheme.onSurface,
+                                          color: theme.colorScheme.onSecondary,
                                         ),
                                       ),
                                     ],
