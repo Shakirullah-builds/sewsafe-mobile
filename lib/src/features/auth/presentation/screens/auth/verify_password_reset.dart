@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
-import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
+import 'package:sewsafe_mobile/src/features/auth/presentation/widgets/pin_input.dart';
 
-class ForgotPasswordScreen extends StatelessWidget {
-  ForgotPasswordScreen({super.key});
+class VerifyPasswordResetScreen extends ConsumerStatefulWidget {
+  const VerifyPasswordResetScreen({super.key});
 
-  final _emailController = TextEditingController();
+  @override
+  ConsumerState<VerifyPasswordResetScreen> createState() =>
+      _VerifyPasswordResetScreenState();
+}
 
+class _VerifyPasswordResetScreenState
+    extends ConsumerState<VerifyPasswordResetScreen> {
+  final pinController = TextEditingController();
+  final focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return GestureDetector(
       onTap: () =>
           FocusScope.of(context).unfocus(), // Dismiss keyboard on tap outside
@@ -31,6 +37,7 @@ class ForgotPasswordScreen extends StatelessWidget {
         ),
         body: SafeArea(
           child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 20.h),
               child: Column(
@@ -42,7 +49,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         CustomText(
-                          'Forgot Password',
+                          'Verification',
                           style: theme.textTheme.displayMedium?.copyWith(
                             //fontSize: 24.spMin,
                             fontWeight: FontWeight.w600,
@@ -51,31 +58,22 @@ class ForgotPasswordScreen extends StatelessWidget {
                         15.verticalSpace,
                         CustomText(
                           textAlign: TextAlign.center,
-                          'Enter your registered email address below. We\'ll send you a verification code to reset your password.',
+                          'A verification code has been sent to your email. Enter it below to reset your password.',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: 14.spMin,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                        20.verticalSpace,
-                        CustomTextField(
-                          controller: _emailController,
-                          hintText: 'Email Address',
-                          keyboardType: TextInputType.emailAddress,
-                          prefixIcon: Icon(
-                            Icons.email_rounded,
-                            color: theme.inputDecorationTheme.prefixIconColor,
-                            size: 24.spMin,
-                          ),
-                        ),
                         40.verticalSpace,
+                        PinInput(
+                          pinController: pinController,
+                          focusNode: focusNode,
+                        ),
+                        60.verticalSpace,
                         CustomButton(
-                          text: 'Send Code',
+                          text: 'Verify',
                           onPressed: () {
-                            // Implement password reset logic here
-                            context.pushNamed(
-                              AppRoute.verifyPasswordReset.name,
-                            ); // Navigate to verification screen
+                            // Implement your verification logic here
                           },
                           fontWeight: FontWeight.w700,
                           buttonTextFontSize: 18.spMin,
