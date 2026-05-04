@@ -47,6 +47,7 @@ dependencies:
   
   # Backend
   supabase_flutter: ^2.5.0
+  pinput: ^6.0.2
 
 dev_dependencies:
   flutter_test:
