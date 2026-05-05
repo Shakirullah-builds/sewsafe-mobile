@@ -87,6 +87,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     textAlign: TextAlign.center,
                                     style: theme.textTheme.bodyLarge?.copyWith(
                                       fontSize: 16.spMin,
+                                      color: theme.colorScheme.onPrimary,
                                       fontFamily: GoogleFonts.lato().fontFamily,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -121,7 +122,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             obscureText: true,
                             suffixIcon: Icon(
                               Icons.visibility_off,
-                              color: theme.colorScheme.onSecondary,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
                             ),
                             headerText: 'Password',
                           ),
@@ -144,7 +145,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                         obscureText: true,
                                         suffixIcon: Icon(
                                           Icons.visibility_off,
-                                          color: theme.colorScheme.onSecondary,
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
                                         ),
                                       ),
                                     ],
@@ -166,7 +167,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                           onPressed: () => context.pushNamed(
                                             AppRoute.forgotPassword.name,
                                           ),
-                                          buttonTextFontSize: 13.spMin,
+                                          buttonTextFontSize: 14.spMin,
                                         ),
                                       ),
                                     ],
@@ -190,7 +191,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     fontSize: 15.spMin,
                                     color: theme.colorScheme.onSurface,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: 'Lato',
+                                    fontFamily: GoogleFonts.lato().fontFamily,
                                   ),
                                 ),
                               ),
@@ -210,7 +211,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   ? 'Continue with Google'
                                   : 'Sign up with Google',
                               backgroundColor: AppColors
-                                  .primarySoft, // Light grey from design
+                                  .placeholder, // Light grey from design
                               textColor: theme.colorScheme.onSurface,
                               iconWidget: CustomSvg(
                                 AppIcons.google,
@@ -239,7 +240,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     ? 'Don\'t have an account? '
                                     : 'Already have an account? ',
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 13.spMin,
+                                  fontSize: 14.spMin,
                                   color: theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.w400,
                                   fontFamily: GoogleFonts.lato().fontFamily,

@@ -74,7 +74,7 @@ class CustomEmptyState extends StatelessWidget {
           CustomText(
             subtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: subtitleColor ?? theme.colorScheme.,
+              color: subtitleColor ?? theme.colorScheme.secondaryContainer,
               height: 1.5.h,
             ),
             textAlign: TextAlign.center,

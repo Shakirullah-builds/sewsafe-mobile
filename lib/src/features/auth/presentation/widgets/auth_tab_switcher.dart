@@ -24,7 +24,7 @@ class AuthTabSwitcher extends StatelessWidget {
         height: 48.h,
         padding: EdgeInsets.all(4.r),
         decoration: BoxDecoration(
-          color: AppColors.primarySoft,
+          color: AppColors.placeholder,
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
@@ -38,7 +38,7 @@ class AuthTabSwitcher extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: !isLogin ? theme.colorScheme.surface : Colors.transparent,
+                    color: !isLogin ? theme.scaffoldBackgroundColor : Colors.transparent,
                     borderRadius: BorderRadius.circular(8.r),
                     boxShadow: !isLogin
                         ? [
@@ -55,10 +55,8 @@ class AuthTabSwitcher extends StatelessWidget {
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 14.spMin,
                        fontFamily: GoogleFonts.lato().fontFamily,
-                    fontWeight: !isLogin ? FontWeight.bold : FontWeight.normal,
-                    color: !isLogin
-                        ? theme.colorScheme.primary
-                        : Colors.grey.shade600,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary
                   ),
                 ),
               ),
@@ -73,7 +71,7 @@ class AuthTabSwitcher extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: isLogin ? theme.colorScheme.surface : Colors.transparent,
+                    color: isLogin ? theme.scaffoldBackgroundColor : Colors.transparent,
                     borderRadius: BorderRadius.circular(8.r),
                     boxShadow: isLogin
                         ? [
@@ -90,10 +88,9 @@ class AuthTabSwitcher extends StatelessWidget {
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 14.spMin,
                        fontFamily: GoogleFonts.lato().fontFamily,
-                      fontWeight: isLogin ? FontWeight.bold : FontWeight.normal,
-                      color: isLogin
-                        ? theme.colorScheme.primary
-                        : Colors.grey.shade600,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary
+                        
                     ),
                     // fontWeight: isLogin ? FontWeight.bold : FontWeight.normal,
                     // color: isLogin

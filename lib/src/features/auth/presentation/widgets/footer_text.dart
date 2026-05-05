@@ -19,7 +19,7 @@ class FooterText extends StatelessWidget {
         fontSize: 10.spMin,
         fontWeight: FontWeight.w400,
         fontFamily: GoogleFonts.lato().fontFamily,
-        color: AppColors.textSecondaryDark,
+        color: AppColors.footerText,
         //height: 1.5,
       ),
       TextSpan(
@@ -28,7 +28,8 @@ class FooterText extends StatelessWidget {
           TextSpan(
             text: 'Terms of Service',
             style: TextStyle(
-              fontSize: 10.spMin,
+              fontSize: 11.spMin,
+              height: 1.63.h,
                fontFamily: GoogleFonts.lato().fontFamily,
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
@@ -42,7 +43,8 @@ class FooterText extends StatelessWidget {
           TextSpan(
             text: 'Privacy Policy.\n',
             style: TextStyle(
-              fontSize: 10.spMin,
+              fontSize: 11.spMin,
+              height: 1.63.h,
                fontFamily: GoogleFonts.lato().fontFamily,
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,

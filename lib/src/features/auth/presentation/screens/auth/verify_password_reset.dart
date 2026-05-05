@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 import 'package:sewsafe_mobile/src/features/auth/presentation/widgets/pin_input.dart';
@@ -31,7 +32,7 @@ class _VerifyPasswordResetScreenState
             iconSize: 24.spMin,
             color: theme
                 .colorScheme
-                .onTertiary, // Use primary color for the back button
+                .onSurface, // Use primary color for the back button
             onPressed: () => context.pop(),
           ),
         ),
@@ -61,6 +62,8 @@ class _VerifyPasswordResetScreenState
                           'A verification code has been sent to your email. Enter it below to reset your password.',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: 14.spMin,
+                            color: theme.colorScheme.onPrimary,
+                            height: 1.71.h,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -74,6 +77,7 @@ class _VerifyPasswordResetScreenState
                           text: 'Verify',
                           onPressed: () {
                             // Implement your verification logic here
+                            context.pushNamed(AppRoute.home.name);
                           },
                           fontWeight: FontWeight.w700,
                           buttonTextFontSize: 18.spMin,

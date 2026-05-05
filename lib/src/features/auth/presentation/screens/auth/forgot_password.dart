@@ -25,7 +25,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             iconSize: 24.spMin,
             color: theme
                 .colorScheme
-                .onTertiary, // Use primary color for the back button
+                .onSurface, // Use primary color for the back button
             onPressed: () => context.pop(),
           ),
         ),
@@ -54,6 +54,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                           'Enter your registered email address below. We\'ll send you a verification code to reset your password.',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: 14.spMin,
+                            color: theme.colorScheme.onPrimary,
+                            height: 1.71.h,
                             fontWeight: FontWeight.w400,
                           ),
                         ),

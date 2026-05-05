@@ -30,7 +30,7 @@ class PinInput extends StatelessWidget {
         color: Colors.white, // The white boxes from your design
         borderRadius: BorderRadius.circular(12.r),
         // Optional: Add a subtle border or shadow to make them pop off the grey background
-        border: Border.all(color: AppColors.primarySoft, width: 1.w),
+        border: Border.all(color: AppColors.placeholder, width: 1.w),
       ),
     );
     return Pinput(
