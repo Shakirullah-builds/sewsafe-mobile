@@ -5,6 +5,7 @@ class AppIcons {
   //  ===========  SVG paths =============
   
   static const String google = 'assets/icons/svg/google.svg';
+  static const String notificationBell = 'assets/icons/svg/notification-bell.svg';
   // static const String visibilityOff = 'assets/icons/visibility_off.svg';
   // static const String visibilityOn = 'assets/icons/visibility_on.svg';
   // static const String email = 'assets/icons/email.svg';
