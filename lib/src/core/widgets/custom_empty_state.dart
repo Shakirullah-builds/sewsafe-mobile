@@ -10,6 +10,9 @@ class CustomEmptyState extends StatelessWidget {
   final String subtitle;
   final Color? subtitleColor;
   final Color? titleColor;
+  final double? titleHeight;
+  final double? subtitleHeight;
+
   // Dual-slot visual system (just like your CustomButton!)
   final IconData? icon;
   final Widget? imageWidget; 
@@ -28,6 +31,8 @@ class CustomEmptyState extends StatelessWidget {
     this.onButtonPressed,
     this.subtitleColor,
     this.titleColor,
+    this.titleHeight,
+    this.subtitleHeight,
   });
 
   @override
@@ -67,6 +72,7 @@ class CustomEmptyState extends StatelessWidget {
               color: titleColor ?? theme.colorScheme.onSurface,
               fontSize: 26.spMin,
               fontWeight: FontWeight.w800,
+              height: titleHeight,
             ),
             textAlign: TextAlign.center,
           ),
@@ -74,8 +80,10 @@ class CustomEmptyState extends StatelessWidget {
           CustomText(
             subtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: subtitleColor ?? theme.colorScheme.secondaryContainer,
-              height: 1.5.h,
+              color: subtitleColor ?? theme.colorScheme.onPrimary,
+              height: subtitleHeight,
+              fontSize: 16.spMin,
+              fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.center,
           ),
@@ -85,7 +93,8 @@ class CustomEmptyState extends StatelessWidget {
             CustomButton(
               text: buttonText!,
               onPressed: onButtonPressed!,
-              width: 200.w, // Keep the button reasonably sized, not full width
+              buttonTextFontSize: 16.spMin,
+              width: 250.w, // Keep the button reasonably sized, not full width
               icon: Icons.add, // A nice default icon for empty state actions
             ),
           ],

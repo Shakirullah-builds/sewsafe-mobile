@@ -24,7 +24,8 @@ class HomeScreen extends StatelessWidget {
                     radius: 30.r,
                     backgroundColor: Colors.grey[300],
                     backgroundImage: const NetworkImage(
-                        'https://avatars.githubusercontent.com/u/258787491?v=4',), // Placeholder avatar
+                      'https://avatars.githubusercontent.com/u/258787491?v=4',
+                    ), // Placeholder avatar
                   ),
                   12.horizontalSpace,
                   Expanded(
@@ -50,18 +51,28 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  CustomSvg(
-                    AppIcons.notificationBell,
-                    width: 24.w,
-                    height: 32.h,
-                    color: theme.colorScheme.onSurface,
+                  Badge(
+                    padding: EdgeInsets.zero,
+                    offset: const Offset(0, 0),
+                    backgroundColor: theme.colorScheme.error,
+                    child: CustomSvg(
+                      AppIcons.notificationBell,
+                      width: 24.w,
+                      height: 32.h,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
                 ],
               ),
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: CustomEmptyState(
                     title: 'No clients or orders yet',
+                    titleHeight: 0.9.h,
+                    subtitleHeight: 1.5.h,
+                    icon: Icons.straighten,
+                    onButtonPressed: () {},
+                    buttonText: 'Add Your First Client',
                     subtitle:
                         'Your journey to never losing a measurement starts here.',
                   ),
