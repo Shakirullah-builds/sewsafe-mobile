@@ -13,8 +13,8 @@ import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
 import 'package:sewsafe_mobile/src/core/widgets/loading_overlay.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/application/auth_controller.dart';
-import 'package:sewsafe_mobile/src/features/auth/presentation/widgets/auth_tab_switcher.dart';
-import 'package:sewsafe_mobile/src/features/auth/presentation/widgets/footer_text.dart';
+import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/auth_tab_switcher.dart';
+import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/footer_text.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});

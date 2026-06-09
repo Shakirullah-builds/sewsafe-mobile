@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
-import 'package:sewsafe_mobile/src/features/auth/presentation/widgets/pin_input.dart';
+import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/pin_input.dart';
 
 class VerifyPasswordResetScreen extends ConsumerStatefulWidget {
   const VerifyPasswordResetScreen({super.key});
