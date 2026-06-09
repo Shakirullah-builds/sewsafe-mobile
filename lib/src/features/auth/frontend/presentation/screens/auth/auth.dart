@@ -12,6 +12,7 @@ import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
 import 'package:sewsafe_mobile/src/core/widgets/loading_overlay.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
+import 'package:sewsafe_mobile/src/features/auth/frontend/application/auth_controller.dart';
 import 'package:sewsafe_mobile/src/features/auth/presentation/widgets/auth_tab_switcher.dart';
 import 'package:sewsafe_mobile/src/features/auth/presentation/widgets/footer_text.dart';
 
@@ -42,7 +43,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const bool isLoading = false;
+    
+    // Listen for errors
+    ref.listen<AsyncValue<void>>(
+      authControllerProvider,
+      (_, state) {
+        if (!state.isLoading && state.hasError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error.toString())),
+          );
+        }
+      },
+    );
+
+    final authState = ref.watch(authControllerProvider);
+    final bool isLoading = authState.isLoading;
 
     return GestureDetector(
       onTap: () => FocusScope.of(
@@ -225,7 +240,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             text: _isLogin ? 'Login' : 'Continue',
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                // Handle Auth
+                                if (_isLogin) {
+                                  ref.read(authControllerProvider.notifier).login(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                  );
+                                } else {
+                                  ref.read(authControllerProvider.notifier).signup(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                  );
+                                }
                               }
                             },
                             fontWeight: FontWeight.w700,
