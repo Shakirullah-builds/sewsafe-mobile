@@ -44,18 +44,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     // Listen for errors
-    ref.listen<AsyncValue<void>>(
-      authControllerProvider,
-      (_, state) {
-        if (!state.isLoading && state.hasError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.error.toString())));
-        }
-      },
-    );
+    ref.listen<AsyncValue<void>>(authControllerProvider, (_, state) {
+      if (!state.isLoading && state.hasError) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(state.error.toString())));
+      }
+    });
 
     final authState = ref.watch(authControllerProvider);
     final bool isLoading = authState.isLoading;
@@ -201,11 +198,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                           },
                                         ),
                                         validator: (value) {
-                                          if (_isLogin) return null; // Ignored during login
+                                          if (_isLogin) {
+                                            return null; // Ignored during login
+                                          }
                                           if (value == null || value.isEmpty) {
                                             return 'Please confirm your password';
                                           }
-                                          if (value != _passwordController.text) {
+                                          if (value !=
+                                              _passwordController.text) {
                                             return 'Passwords do not match';
                                           }
                                           return null;
@@ -289,15 +289,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 if (_isLogin) {
-                                  ref.read(authControllerProvider.notifier).login(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  );
+                                  ref
+                                      .read(authControllerProvider.notifier)
+                                      .login(
+                                        _emailController.text,
+                                        _passwordController.text,
+                                      );
                                 } else {
-                                  ref.read(authControllerProvider.notifier).signup(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  );
+                                  ref
+                                      .read(authControllerProvider.notifier)
+                                      .signup(
+                                        _emailController.text,
+                                        _passwordController.text,
+                                      );
                                 }
                               }
                             },
