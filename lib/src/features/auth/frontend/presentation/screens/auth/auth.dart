@@ -25,6 +25,8 @@ class AuthScreen extends ConsumerStatefulWidget {
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool _isLogin = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -142,10 +144,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           CustomTextField(
                             controller: _passwordController,
                             hintText: '********',
-                            obscureText: true,
-                            suffixIcon: Icon(
-                              Icons.visibility_off,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
+                            obscureText: _obscurePassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
                             ),
                             headerText: 'Password',
                             validator: (value) {
@@ -174,10 +185,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                         controller: _confirmPasswordController,
                                         hintText: '********',
                                         headerText: 'Confirm Password',
-                                        obscureText: true,
-                                        suffixIcon: Icon(
-                                          Icons.visibility_off,
-                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
+                                        obscureText: _obscureConfirmPassword,
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            _obscureConfirmPassword
+                                                ? Icons.visibility_off
+                                                : Icons.visibility,
+                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _obscureConfirmPassword =
+                                                  !_obscureConfirmPassword;
+                                            });
+                                          },
                                         ),
                                         validator: (value) {
                                           if (_isLogin) return null; // Ignored during login
