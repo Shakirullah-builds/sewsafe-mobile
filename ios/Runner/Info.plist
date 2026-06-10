@@ -46,6 +46,19 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>sewsafe</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sewsafe</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSCameraUsageDescription</key>
     <string>SewSafe needs camera access to capture fabric and style details.</string>
     <key>NSPhotoLibraryUsageDescription</key>
