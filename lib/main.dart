@@ -1,6 +1,3 @@
-// ignore: depend_on_referenced_packages
-import 'package:device_preview/device_preview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -30,15 +27,11 @@ void main() async {
   ]);
 
   runApp(
-    DevicePreview(
-      tools: const [...DevicePreview.defaultTools],
-      enabled: !kReleaseMode,
-      builder: (context) => ScreenUtilInit(
-        designSize: const Size(430, 932),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) => const ProviderScope(child: SewSafeMobile()),
-      ),
+    ScreenUtilInit(
+      designSize: const Size(430, 932),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) => const ProviderScope(child: SewSafeMobile()),
     ),
   );
 }
@@ -51,19 +44,10 @@ class SewSafeMobile extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
-      title: "SewSafe",
+      title: "Sewsafe",
       debugShowCheckedModeBanner: false,
-      locale: DevicePreview.locale(context),
-      builder: DevicePreview.appBuilder,
       theme: AppTheme.lightTheme,
       routerConfig: router,
-      // theme: ThemeData(
-      //   useMaterial3: true,
-      //   textTheme: GoogleFonts.playfairDisplayTextTheme(),
-      //   primaryColor: AppColors.primary,
-      // ),
     );
-
-  
   }
 }
