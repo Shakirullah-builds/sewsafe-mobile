@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:open_mail_app/open_mail_app.dart';
+import 'package:open_mail/open_mail.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
@@ -149,7 +149,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                         CustomButton(
                           text: 'Open Mail App',
                           onPressed: () async {
-                            final result = await OpenMailApp.openMailApp();
+                            final result = await OpenMail.openMailApp();
                             
                             if (!result.didOpen && !result.canOpen) {
                               if (context.mounted) {
@@ -164,8 +164,24 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                                 showDialog(
                                   context: context,
                                   builder: (context) {
-                                    return MailAppPickerDialog(
-                                      mailApps: result.options,
+                                    return AlertDialog(
+                                      title: const Text("Open Mail App"),
+                                      content: const Text("Please select your preferred email application:"),
+                                      actions: [
+                                        ...result.options.map((app) {
+                                          return TextButton(
+                                            child: Text(app.name),
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+                                              await OpenMail.openSpecificMailApp(app.name);
+                                            },
+                                          );
+                                        }),
+                                        TextButton(
+                                          child: const Text("Cancel"),
+                                          onPressed: () => Navigator.of(context).pop(),
+                                        ),
+                                      ],
                                     );
                                   },
                                 );
