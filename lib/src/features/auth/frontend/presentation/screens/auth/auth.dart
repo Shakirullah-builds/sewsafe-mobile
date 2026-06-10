@@ -128,6 +128,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             hintText: 'princess@gmail.com',
                             keyboardType: TextInputType.emailAddress,
                             headerText: 'Email Address',
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an email';
+                              }
+                              if (!value.contains('@')) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
                           ),
                           20.verticalSpace,
                           CustomTextField(
@@ -139,6 +148,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
                             ),
                             headerText: 'Password',
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a password';
+                              }
+                              if (value.length < 6) {
+                                return 'Password must be at least 6 characters';
+                              }
+                              return null;
+                            },
                           ),
 
                           // 3. Smoothly hide Confirm Password if they are Logging in
@@ -161,6 +179,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                           Icons.visibility_off,
                                           color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
                                         ),
+                                        validator: (value) {
+                                          if (_isLogin) return null; // Ignored during login
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please confirm your password';
+                                          }
+                                          if (value != _passwordController.text) {
+                                            return 'Passwords do not match';
+                                          }
+                                          return null;
+                                        },
                                       ),
                                     ],
                                   ),
