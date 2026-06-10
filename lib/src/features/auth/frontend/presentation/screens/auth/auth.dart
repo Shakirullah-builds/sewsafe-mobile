@@ -17,7 +17,8 @@ import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/a
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/footer_text.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
-  const AuthScreen({super.key});
+  final bool isLoginInitially;
+  const AuthScreen({super.key, this.isLoginInitially = false});
 
   @override
   ConsumerState<AuthScreen> createState() => _AuthScreenState();
@@ -25,9 +26,15 @@ class AuthScreen extends ConsumerStatefulWidget {
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
   // 1. Removed 'final' so we can actually change it!
-  bool _isLogin = false;
+  late bool _isLogin;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLogin = widget.isLoginInitially;
+  }
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -285,9 +292,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             ),
                           ),
                           30.verticalSpace,
-                          CustomButton(
+                           CustomButton(
                             text: _isLogin ? 'Login' : 'Continue',
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 if (_isLogin) {
                                   ref.read(authControllerProvider.notifier).login(
@@ -295,10 +302,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     _passwordController.text,
                                   );
                                 } else {
-                                  ref.read(authControllerProvider.notifier).signup(
-                                    _emailController.text,
+                                  final email = _emailController.text;
+                                  final router = GoRouter.of(context);
+                                  await ref.read(authControllerProvider.notifier).signup(
+                                    email,
                                     _passwordController.text,
                                   );
+                                  final authState = ref.read(authControllerProvider);
+                                  if (!authState.hasError) {
+                                    router.pushNamed(
+                                      AppRoute.verifyEmail.name,
+                                      queryParameters: {'email': email},
+                                    );
+                                  }
                                 }
                               }
                             },

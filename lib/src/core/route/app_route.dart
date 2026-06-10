@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/auth.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/forgot_password.dart';
+import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/verify_email.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/verify_password_reset.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/home.dart';
 import 'package:sewsafe_mobile/src/features/auth/backend/data/auth_repository.dart';
 
 // 1. Route Enums: You will never type a raw string like '/home' again.
-enum AppRoute { splash, onboarding, login, signup, home, addClient, forgotPassword, verifyPasswordReset }
+enum AppRoute { splash, onboarding, login, signup, home, addClient, forgotPassword, verifyPasswordReset, verifyEmail }
 
 // 2. The Router Provider
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -22,7 +22,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       if (authState.isLoading || !authState.hasValue) return null;
 
       final isLoggedIn = authState.value != null;
-      final isGoingToAuth = state.matchedLocation == '/login' || state.matchedLocation == '/signup';
+      final isGoingToAuth = state.matchedLocation == '/login' || 
+                            state.matchedLocation == '/signup' || 
+                            state.matchedLocation == '/verify-email' ||
+                            state.matchedLocation == '/forgot-password' ||
+                            state.matchedLocation == '/verify-password-reset';
 
       if (!isLoggedIn && !isGoingToAuth) return '/signup';
       if (isLoggedIn && isGoingToAuth) return '/home';
@@ -35,14 +39,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         name: AppRoute.login.name,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Login Screen Setup')), // Placeholder
-        ),
+        builder: (context, state) => const AuthScreen(isLoginInitially: true),
       ),
       GoRoute(
         path: '/signup',
         name: AppRoute.signup.name,
-        builder: (context, state) => const AuthScreen(),
+        builder: (context, state) => const AuthScreen(isLoginInitially: false),
+      ),
+      GoRoute(
+        path: '/verify-email',
+        name: AppRoute.verifyEmail.name,
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return VerifyEmailScreen(email: email);
+        },
       ),
       GoRoute(
         path: '/home',
@@ -52,12 +62,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/forgot-password',
         name: AppRoute.forgotPassword.name,
-        builder: (context, state) => ForgotPasswordScreen(),
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: '/verify-password-reset',
         name: AppRoute.verifyPasswordReset.name,
-        builder: (context, state) => const VerifyPasswordResetScreen(),
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return VerifyPasswordResetScreen(email: email);
+        },
       ),
     ],
   );
