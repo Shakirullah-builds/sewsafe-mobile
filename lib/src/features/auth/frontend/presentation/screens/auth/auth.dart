@@ -24,7 +24,6 @@ class AuthScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
-  // 1. Removed 'final' so we can actually change it!
   bool _isLogin = false;
 
   final _emailController = TextEditingController();
