@@ -48,9 +48,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       authControllerProvider,
       (_, state) {
         if (!state.isLoading && state.hasError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error.toString())),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.error.toString())));
         }
       },
     );

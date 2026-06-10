@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/theme/app_theme.dart';
+import 'package:sewsafe_mobile/src/core/utils/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -31,7 +32,12 @@ void main() async {
       designSize: const Size(430, 932),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (context, child) => const ProviderScope(child: SewSafeMobile()),
+      builder: (context, child) => ProviderScope(
+        observers: [
+          AppLogger(),
+        ], // Riverpod's Error Logger
+        child: const SewSafeMobile(),
+      ),
     ),
   );
 }
