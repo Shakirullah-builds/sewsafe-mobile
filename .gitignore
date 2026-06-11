@@ -46,3 +46,6 @@ app.*.map.json
 
 # Environment Variable 
 .env
+
+# Designs
+/designs

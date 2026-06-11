@@ -91,6 +91,19 @@ class AppTheme {
           fontSize: 16.spMin,
           color: AppColors.textSecondary.withValues(alpha: 0.5), 
         ),
+        labelStyle: GoogleFonts.lato(
+          fontSize: 16.spMin,
+          color: AppColors.textSecondary, 
+          fontWeight: FontWeight.w500,
+        ),
+
+        // theme.textTheme.bodyLarge?.copyWith(
+        //     fontSize: 14.spMin,
+        //     fontFamily: GoogleFonts.lato().fontFamily,
+        //     color: AppColors.textSecondary,
+        //     fontWeight: FontWeight.w500,
+        //   ),
+
         
         // Use your new Stroke color!
         border: OutlineInputBorder(

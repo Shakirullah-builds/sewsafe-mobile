@@ -64,7 +64,7 @@ class CustomTextField extends StatelessWidget {
             suffixIcon: suffixIcon,
             prefixIcon: prefixIcon,
             // Notice we DO NOT define borders, fill colors, or padding here.
-            // Flutter will automatically reach into your AppTheme and apply 
+            // Flutter will automatically reach into your AppTheme and apply
             // the perfect inputDecorationTheme you already wrote!
           ),
         ),
