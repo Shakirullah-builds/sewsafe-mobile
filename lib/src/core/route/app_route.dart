@@ -4,7 +4,7 @@ import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/a
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/forgot_password.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/verify_email.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/verify_password_reset.dart';
-import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/home.dart';
+import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/dashboard.dart';
 import 'package:sewsafe_mobile/src/features/auth/backend/data/auth_repository.dart';
 
 // 1. Route Enums: You will never type a raw string like '/home' again.
@@ -57,7 +57,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         name: AppRoute.home.name,
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
         path: '/forgot-password',
