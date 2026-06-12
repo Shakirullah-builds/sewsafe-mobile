@@ -1,4 +1,4 @@
-package com.example.sewsafe_mobile
+package com.saotech.sewsafe
 
 import io.flutter.embedding.android.FlutterActivity
 
