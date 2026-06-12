@@ -13,6 +13,7 @@ import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
 import 'package:sewsafe_mobile/src/core/widgets/loading_overlay.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/application/auth_controller.dart';
+import 'package:sewsafe_mobile/src/features/auth/backend/data/auth_repository.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/auth_tab_switcher.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/footer_text.dart';
 
@@ -91,7 +92,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 CustomText(
                                   _isLogin ? 'Welcome!' : 'Create Account',
                                   style: theme.textTheme.displayLarge?.copyWith(
-                                    fontSize: 48.spMin,
+                                    fontSize: 35.spMin,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -155,7 +156,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.7,
+                                ), // Muted color for the icon
                               ),
                               onPressed: () {
                                 setState(() {
@@ -196,7 +199,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                             _obscureConfirmPassword
                                                 ? Icons.visibility_off
                                                 : Icons.visibility,
-                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7), // Muted color for the icon
+                                            color: theme.colorScheme.onSurface
+                                                .withValues(
+                                                  alpha: 0.7,
+                                                ), // Muted color for the icon
                                           ),
                                           onPressed: () {
                                             setState(() {
@@ -292,7 +298,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             ),
                           ),
                           30.verticalSpace,
-                           CustomButton(
+                          CustomButton(
                             text: _isLogin ? 'Login' : 'Continue',
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
@@ -306,16 +312,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 } else {
                                   final email = _emailController.text;
                                   final router = GoRouter.of(context);
-                                  await ref.read(authControllerProvider.notifier).signup(
-                                    email,
-                                    _passwordController.text,
+                                  await ref
+                                      .read(authControllerProvider.notifier)
+                                      .signup(email, _passwordController.text);
+                                  final authState = ref.read(
+                                    authControllerProvider,
                                   );
-                                  final authState = ref.read(authControllerProvider);
                                   if (!authState.hasError) {
-                                    router.pushNamed(
-                                      AppRoute.verifyEmail.name,
-                                      queryParameters: {'email': email},
-                                    );
+                                    final currentUser = ref.read(authRepositoryProvider).currentUser;
+                                    if (currentUser == null) {
+                                      router.pushNamed(
+                                        AppRoute.verifyEmail.name,
+                                        queryParameters: {'email': email},
+                                      );
+                                    }
                                   }
                                 }
                               }

@@ -21,6 +21,14 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  // Make the status bar transparent to blend with the app background
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ),
+  );
+
   // Lock the app to Portrait mode
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
