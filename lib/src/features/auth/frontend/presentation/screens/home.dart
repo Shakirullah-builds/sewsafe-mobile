@@ -7,7 +7,6 @@ import 'package:sewsafe_mobile/src/core/widgets/custom_empty_state.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_svg.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 import 'package:sewsafe_mobile/src/features/auth/backend/data/auth_repository.dart';
-import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/tailor_illustration.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -111,7 +110,19 @@ class HomeScreen extends ConsumerWidget {
                     title: 'No clients or orders yet',
                     titleHeight: 1.2,
                     subtitleHeight: 1.4,
-                    imageWidget: const TailorIllustration(),
+                    imageWidget: Container(
+                      width: 140.r,
+                      height: 140.r,
+                      padding: EdgeInsets.all(24.r),
+                      decoration: BoxDecoration(
+                        color: AppColors.placeholder.withValues(alpha: 0.3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Image.asset(
+                        'assets/images/png/measuring-tape.webp',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                     buttonText: 'Add Your First Client',
                     onButtonPressed: () {
                       // Action for adding first client
