@@ -119,6 +119,8 @@ class HomeScreen extends ConsumerWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Image.asset(
+                        width: 200.w,
+                        height: 200.h,
                         'assets/images/png/measuring-tape.webp',
                         fit: BoxFit.contain,
                       ),
