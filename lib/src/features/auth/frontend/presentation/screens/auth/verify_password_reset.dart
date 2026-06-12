@@ -14,10 +14,7 @@ import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/p
 class VerifyPasswordResetScreen extends ConsumerStatefulWidget {
   final String email;
 
-  const VerifyPasswordResetScreen({
-    super.key,
-    required this.email,
-  });
+  const VerifyPasswordResetScreen({super.key, required this.email});
 
   @override
   ConsumerState<VerifyPasswordResetScreen> createState() =>
@@ -51,22 +48,20 @@ class _VerifyPasswordResetScreenState
     final bool isLoading = authState.isLoading;
 
     // Listen for error messages
-    ref.listen<AsyncValue<void>>(
-      authControllerProvider,
-      (_, state) {
-        if (!state.isLoading && state.hasError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.error.toString()),
-              backgroundColor: AppColors.notification,
-            ),
-          );
-        }
-      },
-    );
+    ref.listen<AsyncValue<void>>(authControllerProvider, (_, state) {
+      if (!state.isLoading && state.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.error.toString()),
+            backgroundColor: AppColors.notification,
+          ),
+        );
+      }
+    });
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(), // Dismiss keyboard on tap outside
+      onTap: () =>
+          FocusScope.of(context).unfocus(), // Dismiss keyboard on tap outside
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -127,13 +122,18 @@ class _VerifyPasswordResetScreenState
                               headerText: 'New Password',
                               prefixIcon: Icon(
                                 Icons.lock_outline_rounded,
-                                color: theme.inputDecorationTheme.prefixIconColor,
+                                color:
+                                    theme.inputDecorationTheme.prefixIconColor,
                                 size: 24.spMin,
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.7,
+                                  ),
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -161,17 +161,23 @@ class _VerifyPasswordResetScreenState
                               headerText: 'Confirm New Password',
                               prefixIcon: Icon(
                                 Icons.lock_outline_rounded,
-                                color: theme.inputDecorationTheme.prefixIconColor,
+                                color:
+                                    theme.inputDecorationTheme.prefixIconColor,
                                 size: 24.spMin,
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                  _obscureConfirmPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.7,
+                                  ),
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                                    _obscureConfirmPassword =
+                                        !_obscureConfirmPassword;
                                   });
                                 },
                               ),
@@ -194,7 +200,11 @@ class _VerifyPasswordResetScreenState
                                   final pin = pinController.text.trim();
                                   if (pin.length != 6) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Please enter a valid 6-digit code.')),
+                                      const SnackBar(
+                                        content: Text(
+                                          'Please enter a valid 6-digit code.',
+                                        ),
+                                      ),
                                     );
                                     return;
                                   }
@@ -202,23 +212,35 @@ class _VerifyPasswordResetScreenState
                                   // 1. Verify OTP first
                                   await ref
                                       .read(authControllerProvider.notifier)
-                                      .verifyPasswordResetOTP(widget.email, pin);
+                                      .verifyPasswordResetOTP(
+                                        widget.email,
+                                        pin,
+                                      );
 
                                   if (context.mounted) {
-                                    final step1State = ref.read(authControllerProvider);
+                                    final step1State = ref.read(
+                                      authControllerProvider,
+                                    );
                                     if (!step1State.hasError) {
                                       // 2. OTP is valid, now update password
-                                      final newPassword = _passwordController.text;
+                                      final newPassword =
+                                          _passwordController.text;
                                       await ref
                                           .read(authControllerProvider.notifier)
                                           .updatePassword(newPassword);
 
                                       if (context.mounted) {
-                                        final step2State = ref.read(authControllerProvider);
+                                        final step2State = ref.read(
+                                          authControllerProvider,
+                                        );
                                         if (!step2State.hasError) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
                                             const SnackBar(
-                                              content: Text('Password updated successfully! Welcome back.'),
+                                              content: Text(
+                                                'Password updated successfully! Welcome back.',
+                                              ),
                                               backgroundColor: AppColors.ready,
                                             ),
                                           );
@@ -231,7 +253,7 @@ class _VerifyPasswordResetScreenState
                                   }
                                 }
                               },
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               buttonTextFontSize: 18.spMin,
                             ),
                           ],

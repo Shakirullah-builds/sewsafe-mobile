@@ -327,7 +327,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 }
                               }
                             },
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             buttonTextFontSize: 18.spMin,
                           ),
                           20.verticalSpace,

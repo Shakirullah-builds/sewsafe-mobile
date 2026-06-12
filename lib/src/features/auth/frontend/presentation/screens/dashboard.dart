@@ -130,7 +130,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontSize: 12.spMin,
                 color: color,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
           ],
@@ -178,7 +178,7 @@ class PlaceholderScreen extends StatelessWidget {
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontSize: 22.spMin,
                   color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               8.verticalSpace,

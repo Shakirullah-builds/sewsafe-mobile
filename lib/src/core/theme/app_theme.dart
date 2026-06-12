@@ -13,34 +13,33 @@ class AppTheme {
       // 1. Set the Global Background
       scaffoldBackgroundColor: AppColors.background,
       primaryColor: AppColors.primary,
-      
+
       // 2. The Color Scheme
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         surface: AppColors.background,
         error: AppColors.notification, // Maps to your red!
-        onSurface: AppColors.textSecondary, 
+        onSurface: AppColors.textSecondary,
         outline: AppColors.stroke, // Native outline color
         onPrimary: AppColors.textBody,
-        
       ),
-      textTheme: GoogleFonts.outfitTextTheme().copyWith(
-        displayLarge: GoogleFonts.outfit(
+      textTheme: GoogleFonts.plusJakartaSansTextTheme().copyWith(
+        displayLarge: GoogleFonts.plusJakartaSans(
           color: AppColors.textSecondary,
           fontSize: 57.sp,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
         ),
-        displayMedium: GoogleFonts.outfit(
+        displayMedium: GoogleFonts.plusJakartaSans(
           color: AppColors.textSecondary,
-          fontSize: 45.sp,
-          fontWeight: FontWeight.w700,
+          fontSize: 35.sp,
+          fontWeight: FontWeight.w600,
         ),
-        headlineLarge: GoogleFonts.outfit(
+        headlineLarge: GoogleFonts.plusJakartaSans(
           color: AppColors.textSecondary,
           fontSize: 32.sp,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
         ),
-        titleLarge: GoogleFonts.outfit(
+        titleLarge: GoogleFonts.plusJakartaSans(
           color: AppColors.textSecondary,
           fontSize: 22.sp,
           fontWeight: FontWeight.w600,
@@ -74,7 +73,9 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.surfaceWhite,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.r), // Standard Figma button radius
+            borderRadius: BorderRadius.circular(
+              8.r,
+            ), // Standard Figma button radius
           ),
           padding: EdgeInsets.symmetric(vertical: 16.h),
         ),
@@ -85,26 +86,24 @@ class AppTheme {
         contentPadding: EdgeInsets.all(16.r),
         filled: true,
         fillColor: AppColors.background, // Or background, depending on Figma
-        
         // Use your new Placeholder color!
-        hintStyle: GoogleFonts.outfit(
+        hintStyle: GoogleFonts.plusJakartaSans(
           fontSize: 16.spMin,
-          color: AppColors.textSecondary.withValues(alpha: 0.5), 
+          color: AppColors.textSecondary.withValues(alpha: 0.5),
         ),
-        labelStyle: GoogleFonts.outfit(
+        labelStyle: GoogleFonts.plusJakartaSans(
           fontSize: 16.spMin,
-          color: AppColors.textSecondary, 
+          color: AppColors.textSecondary,
           fontWeight: FontWeight.w500,
         ),
 
         // theme.textTheme.bodyLarge?.copyWith(
         //     fontSize: 14.spMin,
-        //     fontFamily: GoogleFonts.outfit().fontFamily,
+        //     fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
         //     color: AppColors.textSecondary,
         //     fontWeight: FontWeight.w500,
         //   ),
 
-        
         // Use your new Stroke color!
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r), // 12 is standard
@@ -116,17 +115,20 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.6), width: 1.3.w), // Lights up Primary on tap!
+          borderSide: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.6),
+            width: 1.3.w,
+          ), // Lights up Primary on tap!
         ),
       ),
-      
+
       // 6. App Bar
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.textSecondary,
         centerTitle: true,
         elevation: 0, // Flat app bars are standard now
-        titleTextStyle: GoogleFonts.outfit(
+        titleTextStyle: GoogleFonts.plusJakartaSans(
           color: AppColors.textSecondary,
           fontSize: 18.spMin,
           fontWeight: FontWeight.bold,

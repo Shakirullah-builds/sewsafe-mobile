@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:google_fonts/google_fonts.dart';
-
 // Import your legacy kit!
 import 'custom_text.dart';
 import 'custom_button.dart';
@@ -74,10 +72,10 @@ class CustomEmptyState extends StatelessWidget {
           // 2. The Text Layer
           CustomText(
             title,
-            style: GoogleFonts.outfit(
+            style: theme.textTheme.headlineMedium?.copyWith(
               color: titleColor ?? theme.colorScheme.onSurface,
               fontSize: 26.spMin,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               height: titleHeight ?? 1.2,
             ),
             textAlign: TextAlign.center,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_icons.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_empty_state.dart';
@@ -27,20 +26,22 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
+
     // Get current authenticated user
     final authRepository = ref.watch(authRepositoryProvider);
     final user = authRepository.currentUser;
     final email = user?.email ?? '';
-    
+
     // Cleanly extract and capitalize name from email, or fallback to 'Shakirullah'
     final String displayName = email.isNotEmpty
         ? email
-            .split('@')
-            .first
-            .split('.')
-            .map((s) => s.isNotEmpty ? s[0].toUpperCase() + s.substring(1) : '')
-            .join(' ')
+              .split('@')
+              .first
+              .split('.')
+              .map(
+                (s) => s.isNotEmpty ? s[0].toUpperCase() + s.substring(1) : '',
+              )
+              .join(' ')
         : 'Fashion Designer';
 
     return Scaffold(
@@ -79,9 +80,9 @@ class HomeScreen extends ConsumerWidget {
                         2.verticalSpace,
                         CustomText(
                           displayName,
-                          style: GoogleFonts.outfit(
+                          style: theme.textTheme.headlineSmall?.copyWith(
                             fontSize: 24.spMin,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w500,
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -102,7 +103,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              
+
               // 2. Empty State View
               Expanded(
                 child: Center(

@@ -15,10 +15,7 @@ import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/widgets/p
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   final String email;
 
-  const VerifyEmailScreen({
-    super.key,
-    required this.email,
-  });
+  const VerifyEmailScreen({super.key, required this.email});
 
   @override
   ConsumerState<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
@@ -43,19 +40,16 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     final bool isLoading = authState.isLoading;
 
     // Listen for error messages
-    ref.listen<AsyncValue<void>>(
-      authControllerProvider,
-      (_, state) {
-        if (!state.isLoading && state.hasError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.error.toString()),
-              backgroundColor: AppColors.notification,
-            ),
-          );
-        }
-      },
-    );
+    ref.listen<AsyncValue<void>>(authControllerProvider, (_, state) {
+      if (!state.isLoading && state.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.error.toString()),
+            backgroundColor: AppColors.notification,
+          ),
+        );
+      }
+    });
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -82,7 +76,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                           ),
                         ),
                         20.verticalSpace,
-                        
+
                         // Beautiful Circle Envelope Graphic
                         Container(
                           width: 120.r,
@@ -106,7 +100,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                           'Confirm Your Email',
                           style: theme.textTheme.displayLarge?.copyWith(
                             fontSize: 32.spMin,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -130,11 +124,12 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                                   style: theme.textTheme.bodyLarge?.copyWith(
                                     fontSize: 16.spMin,
                                     color: AppColors.primary,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 const TextSpan(
-                                  text: '.\nPlease check your inbox and verify your email to log in.',
+                                  text:
+                                      '.\nPlease check your inbox and verify your email to log in.',
                                 ),
                               ],
                             ),
@@ -147,12 +142,14 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                           text: 'Open Mail App',
                           onPressed: () async {
                             final result = await OpenMail.openMailApp();
-                            
+
                             if (!result.didOpen && !result.canOpen) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('No mail apps installed on this device.'),
+                                    content: Text(
+                                      'No mail apps installed on this device.',
+                                    ),
                                   ),
                                 );
                               }
@@ -163,20 +160,25 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                                   builder: (context) {
                                     return AlertDialog(
                                       title: const Text("Open Mail App"),
-                                      content: const Text("Please select your preferred email application:"),
+                                      content: const Text(
+                                        "Please select your preferred email application:",
+                                      ),
                                       actions: [
                                         ...result.options.map((app) {
                                           return TextButton(
                                             child: Text(app.name),
                                             onPressed: () async {
                                               Navigator.of(context).pop();
-                                              await OpenMail.openSpecificMailApp(app.name);
+                                              await OpenMail.openSpecificMailApp(
+                                                app.name,
+                                              );
                                             },
                                           );
                                         }),
                                         TextButton(
                                           child: const Text("Cancel"),
-                                          onPressed: () => Navigator.of(context).pop(),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
                                         ),
                                       ],
                                     );
@@ -185,7 +187,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                               }
                             }
                           },
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           buttonTextFontSize: 18.spMin,
                         ),
                         20.verticalSpace,
@@ -194,35 +196,43 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                         CustomButton.outlined(
                           text: 'I have verified my email',
                           onPressed: () async {
-                            await ref.read(authControllerProvider.notifier).checkSessionStatus();
+                            await ref
+                                .read(authControllerProvider.notifier)
+                                .checkSessionStatus();
                             if (context.mounted) {
-                              final user = ref.read(authRepositoryProvider).currentUser;
+                              final user = ref
+                                  .read(authRepositoryProvider)
+                                  .currentUser;
                               if (user != null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Email confirmed! Welcome to SewSafe.'),
+                                    content: Text(
+                                      'Email confirmed! Welcome to SewSafe.',
+                                    ),
                                     backgroundColor: AppColors.ready,
                                   ),
                                 );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Verification pending. Please verify your email first.'),
+                                    content: Text(
+                                      'Verification pending. Please verify your email first.',
+                                    ),
                                     backgroundColor: AppColors.notification,
                                   ),
                                 );
                               }
                             }
                           },
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           buttonTextFontSize: 16.spMin,
                         ),
                         20.verticalSpace,
 
                         // OTP Toggle Link
                         CustomButton.text(
-                          text: _showOtpField 
-                              ? 'Hide verification code entry' 
+                          text: _showOtpField
+                              ? 'Hide verification code entry'
                               : 'Received a code? Enter it manually',
                           onPressed: () {
                             setState(() {
@@ -251,28 +261,44 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                                         final pin = _pinController.text.trim();
                                         if (pin.length == 6) {
                                           await ref
-                                              .read(authControllerProvider.notifier)
-                                              .verifySignUpOTP(widget.email, pin);
+                                              .read(
+                                                authControllerProvider.notifier,
+                                              )
+                                              .verifySignUpOTP(
+                                                widget.email,
+                                                pin,
+                                              );
                                           if (context.mounted) {
-                                            final updatedState = ref.read(authControllerProvider);
+                                            final updatedState = ref.read(
+                                              authControllerProvider,
+                                            );
                                             if (!updatedState.hasError) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
                                                 const SnackBar(
-                                                  content: Text('Email verified successfully!'),
-                                                  backgroundColor: AppColors.ready,
+                                                  content: Text(
+                                                    'Email verified successfully!',
+                                                  ),
+                                                  backgroundColor:
+                                                      AppColors.ready,
                                                 ),
                                               );
                                             }
                                           }
                                         } else {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
                                             const SnackBar(
-                                              content: Text('Please enter a 6-digit code.'),
+                                              content: Text(
+                                                'Please enter a 6-digit code.',
+                                              ),
                                             ),
                                           );
                                         }
                                       },
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w600,
                                       buttonTextFontSize: 18.spMin,
                                     ),
                                     20.verticalSpace,
@@ -289,11 +315,15 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                                 .read(authControllerProvider.notifier)
                                 .resendVerification(widget.email);
                             if (context.mounted) {
-                              final updatedState = ref.read(authControllerProvider);
+                              final updatedState = ref.read(
+                                authControllerProvider,
+                              );
                               if (!updatedState.hasError) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Verification email resent successfully!'),
+                                    content: Text(
+                                      'Verification email resent successfully!',
+                                    ),
                                     backgroundColor: AppColors.ready,
                                   ),
                                 );
