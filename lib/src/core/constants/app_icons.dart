@@ -12,4 +12,8 @@ class AppIcons {
   
   // You can also do the same for AppImages if you use PNGs/JPGs
   // static const String splashLogo = 'assets/images/logo.png';
+
+  //  ===========  Image paths =============
+
+  static const String measuringTape = 'assets/images/png/measuring-tape.webp';
 }
