@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:open_mail/open_mail.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/route/app_route.dart';
@@ -124,7 +123,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                                 fontSize: 16.spMin,
                                 color: AppColors.textBody,
                                 fontWeight: FontWeight.w400,
-                                fontFamily: GoogleFonts.lato().fontFamily,
                               ),
                               children: [
                                 TextSpan(
@@ -133,7 +131,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                                     fontSize: 16.spMin,
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w700,
-                                    fontFamily: GoogleFonts.lato().fontFamily,
                                   ),
                                 ),
                                 const TextSpan(

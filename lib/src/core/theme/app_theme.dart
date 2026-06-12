@@ -24,26 +24,26 @@ class AppTheme {
         onPrimary: AppColors.textBody,
         
       ),
-      textTheme: GoogleFonts.latoTextTheme().copyWith(
-        displayLarge: GoogleFonts.playfairDisplay(
+      textTheme: GoogleFonts.outfitTextTheme().copyWith(
+        displayLarge: GoogleFonts.outfit(
           color: AppColors.textSecondary,
           fontSize: 57.sp,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w700,
         ),
-        displayMedium: GoogleFonts.playfairDisplay(
+        displayMedium: GoogleFonts.outfit(
           color: AppColors.textSecondary,
           fontSize: 45.sp,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w700,
         ),
-        headlineLarge: GoogleFonts.playfairDisplay(
+        headlineLarge: GoogleFonts.outfit(
           color: AppColors.textSecondary,
           fontSize: 32.sp,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w700,
         ),
-        titleLarge: GoogleFonts.playfairDisplay(
+        titleLarge: GoogleFonts.outfit(
           color: AppColors.textSecondary,
           fontSize: 22.sp,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w600,
         ),
         displaySmall: TextStyle(
           color: AppColors.textSecondary,
@@ -87,11 +87,11 @@ class AppTheme {
         fillColor: AppColors.background, // Or background, depending on Figma
         
         // Use your new Placeholder color!
-        hintStyle: GoogleFonts.lato(
+        hintStyle: GoogleFonts.outfit(
           fontSize: 16.spMin,
           color: AppColors.textSecondary.withValues(alpha: 0.5), 
         ),
-        labelStyle: GoogleFonts.lato(
+        labelStyle: GoogleFonts.outfit(
           fontSize: 16.spMin,
           color: AppColors.textSecondary, 
           fontWeight: FontWeight.w500,
@@ -99,7 +99,7 @@ class AppTheme {
 
         // theme.textTheme.bodyLarge?.copyWith(
         //     fontSize: 14.spMin,
-        //     fontFamily: GoogleFonts.lato().fontFamily,
+        //     fontFamily: GoogleFonts.outfit().fontFamily,
         //     color: AppColors.textSecondary,
         //     fontWeight: FontWeight.w500,
         //   ),
@@ -126,7 +126,7 @@ class AppTheme {
         foregroundColor: AppColors.textSecondary,
         centerTitle: true,
         elevation: 0, // Flat app bars are standard now
-        titleTextStyle: GoogleFonts.lato(
+        titleTextStyle: GoogleFonts.outfit(
           color: AppColors.textSecondary,
           fontSize: 18.spMin,
           fontWeight: FontWeight.bold,

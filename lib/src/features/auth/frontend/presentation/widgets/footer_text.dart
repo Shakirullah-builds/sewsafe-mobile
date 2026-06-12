@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class FooterText extends StatelessWidget {
   const FooterText({
@@ -18,7 +17,6 @@ class FooterText extends StatelessWidget {
       style: theme.textTheme.bodySmall?.copyWith(
         fontSize: 10.spMin,
         fontWeight: FontWeight.w400,
-        fontFamily: GoogleFonts.lato().fontFamily,
         color: AppColors.footerText,
         //height: 1.5,
       ),
@@ -30,7 +28,6 @@ class FooterText extends StatelessWidget {
             style: TextStyle(
               fontSize: 11.spMin,
               height: 1.63.h,
-               fontFamily: GoogleFonts.lato().fontFamily,
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),
@@ -45,7 +42,6 @@ class FooterText extends StatelessWidget {
             style: TextStyle(
               fontSize: 11.spMin,
               height: 1.63.h,
-               fontFamily: GoogleFonts.lato().fontFamily,
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),

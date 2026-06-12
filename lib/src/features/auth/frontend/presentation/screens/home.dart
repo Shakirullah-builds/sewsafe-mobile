@@ -74,13 +74,12 @@ class HomeScreen extends ConsumerWidget {
                             fontSize: 16.spMin,
                             fontWeight: FontWeight.w500,
                             color: AppColors.primary,
-                            fontFamily: GoogleFonts.lato().fontFamily,
                           ),
                         ),
                         2.verticalSpace,
                         CustomText(
                           displayName,
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.outfit(
                             fontSize: 24.spMin,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textSecondary,

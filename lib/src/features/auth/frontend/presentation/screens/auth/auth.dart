@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_icons.dart';
 import 'package:sewsafe_mobile/src/core/route/app_route.dart';
@@ -110,7 +109,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     style: theme.textTheme.bodyLarge?.copyWith(
                                       fontSize: 16.spMin,
                                       color: theme.colorScheme.onPrimary,
-                                      fontFamily: GoogleFonts.lato().fontFamily,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -268,7 +266,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     fontSize: 15.spMin,
                                     color: theme.colorScheme.onSurface,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: GoogleFonts.lato().fontFamily,
                                   ),
                                 ),
                               ),
@@ -345,7 +342,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   fontSize: 14.spMin,
                                   color: theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.w400,
-                                  fontFamily: GoogleFonts.lato().fontFamily,
                                 ),
                                 children: [
                                   TextSpan(
@@ -354,7 +350,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                       fontSize: 13.spMin,
                                       color: theme.colorScheme.primary,
                                       fontWeight: FontWeight.w400,
-                                      fontFamily: GoogleFonts.lato().fontFamily,
                                     ),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {

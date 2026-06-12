@@ -17,8 +17,8 @@ class CustomEmptyState extends StatelessWidget {
 
   // Dual-slot visual system (just like your CustomButton!)
   final IconData? icon;
-  final Widget? imageWidget; 
-  
+  final Widget? imageWidget;
+
   // The Call to Action
   final String? buttonText;
   final VoidCallback? onButtonPressed;
@@ -55,13 +55,17 @@ class CustomEmptyState extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(24.r),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.05), // Soft background bubble
+                color: theme.colorScheme.primary.withValues(
+                  alpha: 0.05,
+                ), // Soft background bubble
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
                 size: 64.sp,
-                color: theme.colorScheme.primary.withValues(alpha: 0.5), // Muted primary color
+                color: theme.colorScheme.primary.withValues(
+                  alpha: 0.5,
+                ), // Muted primary color
               ),
             ),
             24.verticalSpace,
@@ -70,9 +74,9 @@ class CustomEmptyState extends StatelessWidget {
           // 2. The Text Layer
           CustomText(
             title,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.outfit(
               color: titleColor ?? theme.colorScheme.onSurface,
-              fontSize: 28.spMin,
+              fontSize: 26.spMin,
               fontWeight: FontWeight.w700,
               height: titleHeight ?? 1.2,
             ),

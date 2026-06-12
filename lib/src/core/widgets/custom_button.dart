@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'custom_text.dart';
 
 /// Private enum to track the button type safely
@@ -115,7 +114,6 @@ class CustomButton extends StatelessWidget {
                   color: defaultTextColor,
                   fontWeight: fontWeight ?? FontWeight.w500,
                   fontSize: buttonTextFontSize ?? 16.spMin,
-                  fontFamily: GoogleFonts.lato().fontFamily,
                 ),
               ),
             ],

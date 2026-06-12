@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 
@@ -54,7 +53,6 @@ class AuthTabSwitcher extends StatelessWidget {
                     'Sign-up',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 14.spMin,
-                       fontFamily: GoogleFonts.lato().fontFamily,
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.primary
                   ),
@@ -87,7 +85,6 @@ class AuthTabSwitcher extends StatelessWidget {
                     'Login',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 14.spMin,
-                       fontFamily: GoogleFonts.lato().fontFamily,
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.primary
                         
