@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
+import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/home.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -42,7 +44,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
         child: FloatingActionButton(
           onPressed: () {
-            // Action for FAB
+            context.pushNamed(AppRoute.addClient.name);
           },
           backgroundColor: AppColors.primary,
           elevation: 0,

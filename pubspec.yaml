@@ -49,6 +49,7 @@ dependencies:
   supabase_flutter: ^2.5.0
   pinput: ^6.0.2
   open_mail: ^1.2.1
+  image_picker: ^1.0.5
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_icons.dart';
+import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_empty_state.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_svg.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
@@ -81,7 +83,7 @@ class HomeScreen extends ConsumerWidget {
                           displayName,
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontSize: 24.spMin,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w700,
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -97,7 +99,7 @@ class HomeScreen extends ConsumerWidget {
                       AppIcons.notificationBell,
                       width: 24.w,
                       height: 32.h,
-                      color: AppColors.darkSlate,
+                      color: AppColors.textBody,
                     ),
                   ),
                 ],
@@ -111,23 +113,23 @@ class HomeScreen extends ConsumerWidget {
                     titleHeight: 1.2,
                     subtitleHeight: 1.4,
                     imageWidget: Container(
-                      width: 140.r,
-                      height: 140.r,
+                      width: 180.r,
+                      height: 180.r,
                       padding: EdgeInsets.all(24.r),
                       decoration: BoxDecoration(
                         color: AppColors.placeholder.withValues(alpha: 0.3),
                         shape: BoxShape.circle,
                       ),
                       child: Image.asset(
-                        width: 200.w,
-                        height: 200.h,
                         AppIcons.measuringTape,
+                        width: 130.r,
+                        height: 130.r,
                         fit: BoxFit.contain,
                       ),
                     ),
                     buttonText: 'Add Your First Client',
                     onButtonPressed: () {
-                      // Action for adding first client
+                      context.pushNamed(AppRoute.addClient.name);
                     },
                     subtitle:
                         'Your journey to never losing a measurement starts here.',
