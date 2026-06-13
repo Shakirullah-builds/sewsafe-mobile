@@ -43,7 +43,7 @@ class HomeScreen extends ConsumerWidget {
                 (s) => s.isNotEmpty ? s[0].toUpperCase() + s.substring(1) : '',
               )
               .join(' ')
-        : 'Fashion Designer';
+        : 'User';
 
     return Scaffold(
       backgroundColor: AppColors.background,

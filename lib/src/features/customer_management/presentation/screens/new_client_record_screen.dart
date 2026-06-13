@@ -18,8 +18,8 @@ class CustomFieldControllerPair {
   final TextEditingController valueController;
 
   CustomFieldControllerPair()
-      : nameController = TextEditingController(),
-        valueController = TextEditingController();
+    : nameController = TextEditingController(),
+      valueController = TextEditingController();
 
   void dispose() {
     nameController.dispose();
@@ -31,7 +31,8 @@ class NewClientRecordScreen extends ConsumerStatefulWidget {
   const NewClientRecordScreen({super.key});
 
   @override
-  ConsumerState<NewClientRecordScreen> createState() => _NewClientRecordScreenState();
+  ConsumerState<NewClientRecordScreen> createState() =>
+      _NewClientRecordScreenState();
 }
 
 class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
@@ -46,7 +47,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
 
   // Cache of measurement controllers for both genders to preserve values when toggling
   final Map<String, TextEditingController> _measurementControllers = {};
-  
+
   // List of active custom key-value pairs
   final List<CustomFieldControllerPair> _customFields = [];
 
@@ -59,7 +60,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
     'Hips',
     'Inseam',
     'Shirt Length',
-    'Trouser Length'
+    'Trouser Length',
   ];
 
   final List<String> _femaleKeys = [
@@ -71,7 +72,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
     'Waist',
     'Hips',
     'Blouse Length',
-    'Skirt/Trouser Length'
+    'Skirt/Trouser Length',
   ];
 
   @override
@@ -109,9 +110,9 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error choosing image: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error choosing image: $e')));
       }
     }
   }
@@ -175,7 +176,9 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Note: Image upload failed ($e). Saving client without image.'),
+              content: Text(
+                'Note: Image upload failed ($e). Saving client without image.',
+              ),
               backgroundColor: AppColors.notification,
             ),
           );
@@ -187,7 +190,9 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
       }
     }
 
-    final success = await ref.read(clientControllerProvider.notifier).addClient(
+    final success = await ref
+        .read(clientControllerProvider.notifier)
+        .addClient(
           name: name,
           phone: phone,
           gender: gender,
@@ -228,7 +233,10 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
           backgroundColor: AppColors.background,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: AppColors.textSecondary),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: AppColors.textSecondary,
+            ),
             onPressed: () => context.pop(),
           ),
           title: CustomText(
@@ -341,7 +349,10 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                     itemCount: activeKeys.length,
                     itemBuilder: (context, index) {
                       final key = activeKeys[index];
-                      return _buildMeasurementField(key, _measurementControllers[key]!);
+                      return _buildMeasurementField(
+                        key,
+                        _measurementControllers[key]!,
+                      );
                     },
                   ),
                   20.verticalSpace,
@@ -418,7 +429,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                     color: AppColors.primary.withValues(alpha: 0.15),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ]
               : [],
         ),
@@ -528,7 +539,10 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
     );
   }
 
-  Widget _buildMeasurementField(String label, TextEditingController controller) {
+  Widget _buildMeasurementField(
+    String label,
+    TextEditingController controller,
+  ) {
     final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
@@ -574,7 +588,11 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                   _customFields.add(CustomFieldControllerPair());
                 });
               },
-              icon: Icon(Icons.add_circle_outline, size: 18.sp, color: AppColors.primary),
+              icon: Icon(
+                Icons.add_circle_outline,
+                size: 18.sp,
+                color: AppColors.primary,
+              ),
               label: CustomText(
                 'Add Custom',
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -623,6 +641,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                       controller: pair.nameController,
                       hintText: 'e.g., Cap Size',
                       headerText: 'Label',
+                      //keyboardType: TextInputType.,
                     ),
                   ),
                   12.horizontalSpace,
@@ -633,7 +652,9 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                       controller: pair.valueController,
                       hintText: '0.0',
                       headerText: 'Value',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       suffixIcon: Padding(
                         padding: EdgeInsets.only(right: 12.w, top: 14.h),
                         child: Text(
