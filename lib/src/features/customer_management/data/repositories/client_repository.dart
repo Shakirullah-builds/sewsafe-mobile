@@ -7,21 +7,53 @@ class ClientRepository {
 
   ClientRepository(this._supabase);
 
-  /// Inserts a new client record into the 'clients' table
+  /// Inserts a new client record and their measurements using a two-step relational transaction
   Future<void> createClient(Client client) async {
-    await _supabase.from('clients').insert(client.toJson());
+    // 1. Insert basic metadata into the 'clients' table
+    final clientResponse = await _supabase.from('clients').insert({
+      'fullName': client.fullName,
+      'phoneNumber': client.phoneNumber,
+      'gender': client.gender,
+      'userId': client.userId,
+    }).select().single();
+
+    final clientId = clientResponse['id'] as String;
+
+    // 2. Insert dynamic measurements into the 'measurements' table
+    await _supabase.from('measurements').insert({
+      'clientsId': clientId,
+      'measurementData': {
+        ...client.measurements,
+        if (client.photoUrl != null) '_photo_url': client.photoUrl,
+      },
+    });
   }
 
   /// Fetches all client records belonging to the authenticated tailor
   Future<List<Client>> getClients() async {
+    // Fetch clients joined with their measurements
     final response = await _supabase
         .from('clients')
-        .select()
-        .order('created_at', ascending: false);
+        .select('*, measurements(*)')
+        .order('createdAt', ascending: false);
     
-    return (response as List<dynamic>)
-        .map((json) => Client.fromJson(json as Map<String, dynamic>))
-        .toList();
+    final list = response as List<dynamic>;
+    return list.map((json) {
+      final clientMap = Map<String, dynamic>.from(json as Map);
+      
+      // Pull measurements list relations
+      final measurementsList = json['measurements'] as List<dynamic>? ?? [];
+      
+      // Extract the measurementData JSON from the latest measurement row
+      Map<String, dynamic> measurementsJson = {};
+      if (measurementsList.isNotEmpty) {
+        final latestMeasurement = measurementsList.first as Map<String, dynamic>;
+        measurementsJson = latestMeasurement['measurementData'] as Map<String, dynamic>? ?? {};
+      }
+      
+      clientMap['measurements'] = measurementsJson;
+      return Client.fromJson(clientMap);
+    }).toList();
   }
 }
 

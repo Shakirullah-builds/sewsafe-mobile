@@ -15,8 +15,8 @@ class ClientController extends _$ClientController {
   /// Creates a new client record and updates state accordingly.
   /// Returns [true] if successful, [false] otherwise.
   Future<bool> addClient({
-    required String name,
-    required String phone,
+    required String fullName,
+    required String phoneNumber,
     required String gender,
     required Map<String, double> measurements,
     String? photoUrl,
@@ -32,8 +32,8 @@ class ClientController extends _$ClientController {
 
       final client = Client(
         userId: user.id,
-        name: name,
-        phone: phone.trim().isEmpty ? null : phone.trim(),
+        fullName: fullName,
+        phoneNumber: phoneNumber.trim().isEmpty ? null : phoneNumber.trim(),
         gender: gender,
         measurements: measurements,
         photoUrl: photoUrl,

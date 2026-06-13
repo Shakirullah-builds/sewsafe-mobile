@@ -190,11 +190,9 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
       }
     }
 
-    final success = await ref
-        .read(clientControllerProvider.notifier)
-        .addClient(
-          name: name,
-          phone: phone,
+    final success = await ref.read(clientControllerProvider.notifier).addClient(
+          fullName: name,
+          phoneNumber: phone,
           gender: gender,
           measurements: measurements,
           photoUrl: photoUrl,

@@ -1,8 +1,8 @@
 class Client {
   final String? id;
   final String userId;
-  final String name;
-  final String? phone;
+  final String fullName;
+  final String? phoneNumber;
   final String gender;
   final Map<String, double> measurements;
   final String? photoUrl;
@@ -11,8 +11,8 @@ class Client {
   Client({
     this.id,
     required this.userId,
-    required this.name,
-    this.phone,
+    required this.fullName,
+    this.phoneNumber,
     required this.gender,
     required this.measurements,
     this.photoUrl,
@@ -36,14 +36,14 @@ class Client {
 
     return Client(
       id: json['id'] as String?,
-      userId: json['user_id'] as String,
-      name: json['name'] as String,
-      phone: json['phone'] as String?,
+      userId: json['userId'] as String,
+      fullName: json['fullName'] as String,
+      phoneNumber: json['phoneNumber'] as String?,
       gender: json['gender'] as String,
       measurements: measurementsMap,
       photoUrl: photoUrl,
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at'] as String)
+      createdAt: json['createdAt'] != null 
+          ? DateTime.parse(json['createdAt'] as String)
           : null,
     );
   }
@@ -52,15 +52,15 @@ class Client {
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
-      'user_id': userId,
-      'name': name,
-      'phone': phone,
+      'userId': userId,
+      'fullName': fullName,
+      'phoneNumber': phoneNumber,
       'gender': gender,
       'measurements': {
         ...measurements,
         if (photoUrl != null) '_photo_url': photoUrl,
       },
-      if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+      if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };
   }
 
@@ -68,8 +68,8 @@ class Client {
   Client copyWith({
     String? id,
     String? userId,
-    String? name,
-    String? phone,
+    String? fullName,
+    String? phoneNumber,
     String? gender,
     Map<String, double>? measurements,
     String? photoUrl,
@@ -78,8 +78,8 @@ class Client {
     return Client(
       id: id ?? this.id,
       userId: userId ?? this.userId,
-      name: name ?? this.name,
-      phone: phone ?? this.phone,
+      fullName: fullName ?? this.fullName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
       gender: gender ?? this.gender,
       measurements: measurements ?? this.measurements,
       photoUrl: photoUrl ?? this.photoUrl,
