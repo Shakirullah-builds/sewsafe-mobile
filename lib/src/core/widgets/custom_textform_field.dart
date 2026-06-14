@@ -42,7 +42,7 @@ class CustomTextField extends StatelessWidget {
           style: theme.textTheme.bodyLarge?.copyWith(
             fontSize: 14.spMin,
             color: AppColors.textSecondary,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
           ),
         ),
         5.verticalSpace,

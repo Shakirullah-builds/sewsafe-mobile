@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
+import 'package:sewsafe_mobile/src/core/widgets/custom_tab_switcher.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
 import 'package:sewsafe_mobile/src/core/widgets/loading_overlay.dart';
@@ -24,6 +25,65 @@ class CustomFieldControllerPair {
   void dispose() {
     nameController.dispose();
     valueController.dispose();
+  }
+}
+
+/// Custom painter to draw a smooth, resolution-independent dashed border around cards
+class DashedRectPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double gap;
+  final double dashLength;
+  final double borderRadius;
+
+  DashedRectPainter({
+    required this.color,
+    this.strokeWidth = 1.5,
+    this.gap = 4.0,
+    this.dashLength = 6.0,
+    this.borderRadius = 12.0,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          Radius.circular(borderRadius),
+        ),
+      );
+
+    final dashedPath = Path();
+    double distance = 0.0;
+
+    for (final pathMetric in path.computeMetrics()) {
+      while (distance < pathMetric.length) {
+        final length = dashLength;
+        dashedPath.addPath(
+          pathMetric.extractPath(distance, distance + length),
+          Offset.zero,
+        );
+        distance += length + gap;
+      }
+      distance = 0.0;
+    }
+
+    canvas.drawPath(dashedPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant DashedRectPainter oldDelegate) {
+    return oldDelegate.color != color ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.gap != gap ||
+        oldDelegate.dashLength != dashLength ||
+        oldDelegate.borderRadius != borderRadius;
   }
 }
 
@@ -190,7 +250,9 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
       }
     }
 
-    final success = await ref.read(clientControllerProvider.notifier).addClient(
+    final success = await ref
+        .read(clientControllerProvider.notifier)
+        .addClient(
           fullName: name,
           phoneNumber: phone,
           gender: gender,
@@ -269,37 +331,37 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Gender Selection
-                  CustomText(
-                    'Client Gender',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontSize: 14.spMin,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  10.verticalSpace,
-                  _buildGenderSelector(),
-                  24.verticalSpace,
-
-                  // 2. Style Photo Selector
-                  CustomText(
-                    'Style Reference Photo',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontSize: 14.spMin,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  10.verticalSpace,
+                  // 1. Style Photo Selector (First prominent element)
                   _buildPhotoSelector(),
                   24.verticalSpace,
 
-                  // 3. Basic Info Card
+                  // 2. Gender Selection (Sliding tab layout)
                   CustomText(
-                    'Client Information',
+                    'Client Gender',
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      fontSize: 14.spMin,
+                      fontSize: 16.spMin,
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  10.verticalSpace,
+                  CustomTabSwitcher(
+                    selectedIndex: _selectedGender == 'male' ? 0 : 1,
+                    labels: const ['Male', 'Female'],
+                    icons: const [Icons.male, Icons.female],
+                    onChanged: (index) {
+                      setState(() {
+                        _selectedGender = index == 0 ? 'male' : 'female';
+                      });
+                    },
+                  ),
+                  24.verticalSpace,
+
+                  // 3. Basic Info Card (Client Details)
+                  CustomText(
+                    'Client Details',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontSize: 16.spMin,
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
                     ),
@@ -329,7 +391,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                   CustomText(
                     'Standard Measurements',
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      fontSize: 14.spMin,
+                      fontSize: 16.spMin,
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
                     ),
@@ -374,92 +436,12 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
     );
   }
 
-  Widget _buildGenderSelector() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildGenderButton(
-            gender: 'male',
-            label: 'Male',
-            icon: Icons.male,
-            isSelected: _selectedGender == 'male',
-          ),
-        ),
-        16.horizontalSpace,
-        Expanded(
-          child: _buildGenderButton(
-            gender: 'female',
-            label: 'Female',
-            icon: Icons.female,
-            isSelected: _selectedGender == 'female',
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGenderButton({
-    required String gender,
-    required String label,
-    required IconData icon,
-    required bool isSelected,
-  }) {
-    final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedGender = gender;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(vertical: 14.h),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceWhite,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.placeholder,
-            width: 1.5.w,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.white : AppColors.textBody,
-              size: 20.sp,
-            ),
-            8.horizontalSpace,
-            CustomText(
-              label,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: isSelected ? Colors.white : AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-                fontSize: 14.spMin,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildPhotoSelector() {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: _pickImage,
       child: Container(
-        height: 140.h,
+        height: 240.h,
         width: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.surfaceWhite,
@@ -482,8 +464,8 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                     ),
                   ),
                   Positioned(
-                    top: 8.h,
-                    right: 8.w,
+                    top: 12.h,
+                    right: 12.w,
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -491,7 +473,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                         });
                       },
                       child: Container(
-                        padding: EdgeInsets.all(6.r),
+                        padding: EdgeInsets.all(8.r),
                         decoration: const BoxDecoration(
                           color: Colors.black54,
                           shape: BoxShape.circle,
@@ -499,7 +481,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                         child: Icon(
                           Icons.close,
                           color: Colors.white,
-                          size: 16.sp,
+                          size: 18.sp,
                         ),
                       ),
                     ),
@@ -510,25 +492,25 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.camera_alt_outlined,
+                    Icons.add_a_photo_rounded,
                     color: AppColors.primary,
-                    size: 32.sp,
+                    size: 40.sp,
                   ),
-                  8.verticalSpace,
+                  12.verticalSpace,
                   CustomText(
-                    'Upload Style Reference Photo',
+                    'Upload Style Photo',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13.spMin,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15.spMin,
                     ),
                   ),
-                  4.verticalSpace,
+                  6.verticalSpace,
                   CustomText(
                     'Tap to choose from gallery',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppColors.textBody.withValues(alpha: 0.7),
-                      fontSize: 11.spMin,
+                      fontSize: 12.spMin,
                     ),
                   ),
                 ],
@@ -569,42 +551,18 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            CustomText(
-              'Custom Measurements',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontSize: 14.spMin,
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            TextButton.icon(
-              onPressed: () {
-                setState(() {
-                  _customFields.add(CustomFieldControllerPair());
-                });
-              },
-              icon: Icon(
-                Icons.add_circle_outline,
-                size: 18.sp,
-                color: AppColors.primary,
-              ),
-              label: CustomText(
-                'Add Custom',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13.spMin,
-                ),
-              ),
-            ),
-          ],
+        CustomText(
+          'Custom Measurements',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontSize: 16.spMin,
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
+        10.verticalSpace,
         if (_customFields.isEmpty)
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.h),
+            padding: EdgeInsets.only(bottom: 12.h),
             child: Container(
               width: double.infinity,
               padding: EdgeInsets.all(12.r),
@@ -621,7 +579,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
               ),
             ),
           )
-        else
+        else ...[
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -639,7 +597,6 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                       controller: pair.nameController,
                       hintText: 'e.g., Cap Size',
                       headerText: 'Label',
-                      //keyboardType: TextInputType.,
                     ),
                   ),
                   12.horizontalSpace,
@@ -685,6 +642,46 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
               );
             },
           ),
+          16.verticalSpace,
+        ],
+        // 6. Prominent Dashed-Border Action Card Button
+        CustomPaint(
+          painter: DashedRectPainter(
+            color: AppColors.primary,
+            borderRadius: 12.r,
+          ),
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _customFields.add(CustomFieldControllerPair());
+              });
+            },
+            child: Container(
+              height: 56.h,
+              width: double.infinity,
+              color: Colors.transparent, // Capture gestures in full area
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_circle_outline,
+                    color: AppColors.primary,
+                    size: 20.sp,
+                  ),
+                  8.horizontalSpace,
+                  CustomText(
+                    'Add Custom Measurement',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.spMin,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
