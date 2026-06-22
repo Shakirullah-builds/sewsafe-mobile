@@ -282,7 +282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('View All Orders coming soon!'),
+                                content: CustomText('View All Orders coming soon!', color: Colors.white),
                                 backgroundColor: AppColors.primary,
                               ),
                             );

@@ -197,7 +197,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error choosing image: $e')));
+        ).showSnackBar(SnackBar(content: CustomText('Error choosing image: $e', color: Colors.white)));
       }
     }
   }
@@ -262,8 +262,9 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
+              content: CustomText(
                 'Note: Image upload failed ($e). Saving client without image.',
+                color: Colors.white,
               ),
               backgroundColor: AppColors.notification,
             ),
@@ -305,9 +306,9 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(isEditing
+          content: CustomText(isEditing
               ? 'Client details updated successfully!'
-              : 'New client saved successfully!'),
+              : 'New client saved successfully!', color: Colors.white),
           backgroundColor: AppColors.ready,
         ),
       );
@@ -316,7 +317,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
       final error = ref.read(clientControllerProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(error?.toString() ?? 'Failed to save client.'),
+          content: CustomText(error?.toString() ?? 'Failed to save client.', color: Colors.white),
           backgroundColor: AppColors.notification,
         ),
       );
@@ -664,7 +665,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
         headerText: label,
         suffixIcon: Padding(
           padding: EdgeInsets.only(right: 12.w, top: 14.h),
-          child: Text(
+          child: CustomText(
             'in',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textBody.withValues(alpha: 0.6),
@@ -743,7 +744,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                       ),
                       suffixIcon: Padding(
                         padding: EdgeInsets.only(right: 12.w, top: 14.h),
-                        child: Text(
+                        child: CustomText(
                           'in',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: AppColors.textBody.withValues(alpha: 0.6),

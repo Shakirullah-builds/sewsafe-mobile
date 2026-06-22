@@ -308,7 +308,7 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                                               errorBuilder:
                                                   (context, error, stackTrace) {
                                                 return Center(
-                                                  child: Text(
+                                                  child: CustomText(
                                                     initials,
                                                     style: GoogleFonts
                                                         .plusJakartaSans(
@@ -335,7 +335,7 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                                               },
                                             )
                                           : Center(
-                                              child: Text(
+                                              child: CustomText(
                                                 initials,
                                                 style: GoogleFonts
                                                     .plusJakartaSans(

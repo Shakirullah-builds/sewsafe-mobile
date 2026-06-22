@@ -42,7 +42,7 @@ class ClientDetailsScreen extends StatelessWidget {
     if (client.phoneNumber == null || client.phoneNumber!.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cannot share: Client has no phone number saved.'),
+          content: CustomText('Cannot share: Client has no phone number saved.', color: Colors.white),
           backgroundColor: AppColors.notification,
         ),
       );
@@ -84,7 +84,7 @@ class ClientDetailsScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not open WhatsApp: $e'),
+            content: CustomText('Could not open WhatsApp: $e', color: Colors.white),
             backgroundColor: AppColors.notification,
           ),
         );
@@ -97,7 +97,7 @@ class ClientDetailsScreen extends StatelessWidget {
     if (client.phoneNumber == null || client.phoneNumber!.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cannot call: Client has no phone number saved.'),
+          content: CustomText('Cannot call: Client has no phone number saved.', color: Colors.white),
           backgroundColor: AppColors.notification,
         ),
       );
@@ -114,7 +114,7 @@ class ClientDetailsScreen extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Your device cannot place phone calls directly.'),
+              content: CustomText('Your device cannot place phone calls directly.', color: Colors.white),
               backgroundColor: AppColors.notification,
             ),
           );
@@ -124,7 +124,7 @@ class ClientDetailsScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not trigger call: $e'),
+            content: CustomText('Could not trigger call: $e', color: Colors.white),
             backgroundColor: AppColors.notification,
           ),
         );
@@ -242,7 +242,7 @@ class ClientDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           child: Center(
-                            child: Text(
+                            child: CustomText(
                               initials,
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 24.spMin,
