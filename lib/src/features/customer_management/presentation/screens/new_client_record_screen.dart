@@ -11,6 +11,7 @@ import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
 import 'package:sewsafe_mobile/src/core/widgets/loading_overlay.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/presentation/controller/client_controller.dart';
+import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Controller pair to manage dynamic custom text inputs
@@ -88,7 +89,8 @@ class DashedRectPainter extends CustomPainter {
 }
 
 class NewClientRecordScreen extends ConsumerStatefulWidget {
-  const NewClientRecordScreen({super.key});
+  final Client? client;
+  const NewClientRecordScreen({super.key, this.client});
 
   @override
   ConsumerState<NewClientRecordScreen> createState() =>
@@ -99,6 +101,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _notesController = TextEditingController();
 
   String _selectedGender = 'male';
   File? _selectedImage;
@@ -142,12 +145,34 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
     for (final key in [..._maleKeys, ..._femaleKeys]) {
       _measurementControllers[key] = TextEditingController();
     }
+
+    // Populate client details if editing
+    if (widget.client != null) {
+      final client = widget.client!;
+      _nameController.text = client.fullName;
+      _phoneController.text = client.phoneNumber ?? '';
+      _selectedGender = client.gender.toLowerCase();
+      _notesController.text = client.notes ?? '';
+      
+      client.measurements.forEach((key, value) {
+        if (_measurementControllers.containsKey(key)) {
+          _measurementControllers[key]!.text = value.toString();
+        } else {
+          // If measurement is not standard, it's a custom field
+          final pair = CustomFieldControllerPair();
+          pair.nameController.text = key;
+          pair.valueController.text = value.toString();
+          _customFields.add(pair);
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _notesController.dispose();
     for (final controller in _measurementControllers.values) {
       controller.dispose();
     }
@@ -183,6 +208,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
     final name = _nameController.text.trim();
     final phone = _phoneController.text.trim();
     final gender = _selectedGender;
+    final notes = _notesController.text.trim();
 
     // Compile active standard measurements
     final Map<String, double> measurements = {};
@@ -250,20 +276,38 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
       }
     }
 
-    final success = await ref
-        .read(clientControllerProvider.notifier)
-        .addClient(
-          fullName: name,
-          phoneNumber: phone,
-          gender: gender,
-          measurements: measurements,
-          photoUrl: photoUrl,
-        );
+    final isEditing = widget.client != null;
+    final photoUrlToUse = photoUrl ?? widget.client?.photoUrl;
+
+    final success = isEditing
+        ? await ref
+            .read(clientControllerProvider.notifier)
+            .editClient(
+              clientId: widget.client!.id!,
+              fullName: name,
+              phoneNumber: phone,
+              gender: gender,
+              measurements: measurements,
+              photoUrl: photoUrlToUse,
+              notes: notes.isEmpty ? null : notes,
+            )
+        : await ref
+            .read(clientControllerProvider.notifier)
+            .addClient(
+              fullName: name,
+              phoneNumber: phone,
+              gender: gender,
+              measurements: measurements,
+              photoUrl: photoUrlToUse,
+              notes: notes.isEmpty ? null : notes,
+            );
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('New client saved successfully!'),
+        SnackBar(
+          content: Text(isEditing
+              ? 'Client details updated successfully!'
+              : 'New client saved successfully!'),
           backgroundColor: AppColors.ready,
         ),
       );
@@ -300,7 +344,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
             onPressed: () => context.pop(),
           ),
           title: CustomText(
-            'New Client Record',
+            widget.client != null ? 'Edit Client Record' : 'New Client Record',
             style: theme.textTheme.titleLarge?.copyWith(
               fontSize: 18.spMin,
               fontWeight: FontWeight.w700,
@@ -419,11 +463,29 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
 
                   // 5. Dynamic Custom Section
                   _buildCustomFieldsSection(),
+                  24.verticalSpace,
+
+                  // 5.5. Tailoring Notes & Preferences
+                  CustomText(
+                    'Tailoring Notes & Preferences',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontSize: 16.spMin,
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  10.verticalSpace,
+                  CustomTextField(
+                    controller: _notesController,
+                    hintText: 'e.g. prefers loose sleeves, lining required',
+                    headerText: 'Notes',
+                    maxLines: 3,
+                  ),
                   40.verticalSpace,
 
                   // 6. Action Button
                   CustomButton(
-                    text: 'Save Client Record',
+                    text: widget.client != null ? 'Update Client Record' : 'Save Client Record',
                     onPressed: _saveClient,
                   ),
                   24.verticalSpace,
@@ -438,6 +500,8 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
 
   Widget _buildPhotoSelector() {
     final theme = Theme.of(context);
+    final hasExistingPhoto = widget.client?.photoUrl != null;
+
     return GestureDetector(
       onTap: _pickImage,
       child: Container(
@@ -488,31 +552,98 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
                   ),
                 ],
               )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_a_photo_rounded,
-                    color: AppColors.primary,
-                    size: 40.sp,
-                  ),
-                  12.verticalSpace,
-                  CustomText(
-                    'Upload Style Photo',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15.spMin,
-                    ),
-                  ),
-                  6.verticalSpace,
-                  CustomText(
-                    'Tap to choose from gallery',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textBody.withValues(alpha: 0.7),
-                      fontSize: 12.spMin,
-                    ),
-                  ),
+            : hasExistingPhoto
+                ? Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16.r),
+                        child: Image.network(
+                          widget.client!.photoUrl!,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                color: AppColors.notification,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.25),
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                      ),
+                      Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 8.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 16.sp,
+                              ),
+                              8.horizontalSpace,
+                              CustomText(
+                                'Change Photo',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.spMin,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_a_photo_rounded,
+                        color: AppColors.primary,
+                        size: 40.sp,
+                      ),
+                      12.verticalSpace,
+                      CustomText(
+                        'Upload Style Photo',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15.spMin,
+                        ),
+                      ),
+                      6.verticalSpace,
+                      CustomText(
+                        'Tap to choose from gallery',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.textBody.withValues(alpha: 0.7),
+                          fontSize: 12.spMin,
+                        ),
+                      ),
                 ],
               ),
       ),

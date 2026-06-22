@@ -6,7 +6,24 @@ part of 'client_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$clientControllerHash() => r'5a6f6f0157093e83a8f2ba3970c2ed2aca4df5ba';
+String _$clientsListHash() => r'ed325b35fc0de70bc0646995576e1aa87458f8e2';
+
+/// See also [clientsList].
+@ProviderFor(clientsList)
+final clientsListProvider = AutoDisposeFutureProvider<List<Client>>.internal(
+  clientsList,
+  name: r'clientsListProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$clientsListHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ClientsListRef = AutoDisposeFutureProviderRef<List<Client>>;
+String _$clientControllerHash() => r'ee82e6912b960ee8112f7ca8dead7acbb456513e';
 
 /// See also [ClientController].
 @ProviderFor(ClientController)

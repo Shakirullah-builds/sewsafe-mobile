@@ -6,10 +6,23 @@ import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/a
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/verify_password_reset.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/dashboard.dart';
 import 'package:sewsafe_mobile/src/features/auth/backend/data/auth_repository.dart';
+import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/presentation/screens/new_client_record_screen.dart';
+import 'package:sewsafe_mobile/src/features/customer_management/presentation/screens/client_details_screen.dart';
 
 // 1. Route Enums: You will never type a raw string like '/home' again.
-enum AppRoute { splash, onboarding, login, signup, home, addClient, forgotPassword, verifyPasswordReset, verifyEmail }
+enum AppRoute {
+  splash,
+  onboarding,
+  login,
+  signup,
+  home,
+  addClient,
+  clientDetails,
+  forgotPassword,
+  verifyPasswordReset,
+  verifyEmail
+}
 
 // 2. The Router Provider
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -63,7 +76,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/add-client',
         name: AppRoute.addClient.name,
-        builder: (context, state) => const NewClientRecordScreen(),
+        builder: (context, state) {
+          final client = state.extra as Client?;
+          return NewClientRecordScreen(client: client);
+        },
+      ),
+      GoRoute(
+        path: '/client-details',
+        name: AppRoute.clientDetails.name,
+        builder: (context, state) {
+          final client = state.extra as Client;
+          return ClientDetailsScreen(client: client);
+        },
       ),
       GoRoute(
         path: '/forgot-password',

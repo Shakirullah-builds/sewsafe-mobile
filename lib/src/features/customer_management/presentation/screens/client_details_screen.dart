@@ -1,0 +1,702 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
+import 'package:sewsafe_mobile/src/core/route/app_route.dart';
+import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
+import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
+import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
+
+class ClientDetailsScreen extends StatelessWidget {
+  final Client client;
+
+  const ClientDetailsScreen({super.key, required this.client});
+
+  /// Generates a premium pastel background color based on name hash
+  Color _getAvatarColor(String name) {
+    final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
+    final double hue = (hash * 137.5) % 360;
+    return HSLColor.fromAHSL(1.0, hue, 0.45, 0.90).toColor();
+  }
+
+  /// Generates a dark contrasting text color based on name hash
+  Color _getAvatarTextColor(String name) {
+    final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
+    final double hue = (hash * 137.5) % 360;
+    return HSLColor.fromAHSL(1.0, hue, 0.70, 0.35).toColor();
+  }
+
+  /// Extracts up to two initials from the client's full name
+  String _getInitials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || name.trim().isEmpty) return '?';
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  /// Opens WhatsApp with a pre-filled list of measurements
+  Future<void> _shareOnWhatsApp(BuildContext context) async {
+    if (client.phoneNumber == null || client.phoneNumber!.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot share: Client has no phone number saved.'),
+          backgroundColor: AppColors.notification,
+        ),
+      );
+      return;
+    }
+
+    final buffer = StringBuffer();
+    buffer.writeln('Hello ${client.fullName},');
+    buffer.writeln('Here are your body measurements recorded on SewSafe:');
+    buffer.writeln();
+    
+    client.measurements.forEach((key, value) {
+      buffer.writeln('• $key: $value in');
+    });
+
+    if (client.notes != null && client.notes!.trim().isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('Notes: ${client.notes}');
+    }
+
+    buffer.writeln();
+    buffer.writeln('Shared via SewSafe - "Never lose a measurement."');
+
+    final messageText = buffer.toString();
+    
+    // Sanitize phone number digits
+    final cleanPhone = client.phoneNumber!.replaceAll(RegExp(r'[^\d+]'), '');
+    final urlString = 'https://wa.me/${cleanPhone.replaceFirst('+', '')}?text=${Uri.encodeComponent(messageText)}';
+    final url = Uri.parse(urlString);
+
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        // Fallback to web link launch
+        await launchUrl(url, mode: LaunchMode.platformDefault);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not open WhatsApp: $e'),
+            backgroundColor: AppColors.notification,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Initiates a standard phone call
+  Future<void> _callClient(BuildContext context) async {
+    if (client.phoneNumber == null || client.phoneNumber!.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot call: Client has no phone number saved.'),
+          backgroundColor: AppColors.notification,
+        ),
+      );
+      return;
+    }
+
+    final cleanPhone = client.phoneNumber!.replaceAll(RegExp(r'[^\d+]'), '');
+    final url = Uri.parse('tel:$cleanPhone');
+
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Your device cannot place phone calls directly.'),
+              backgroundColor: AppColors.notification,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not trigger call: $e'),
+            backgroundColor: AppColors.notification,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Displays full-screen image overlay modal on tap
+  void _zoomPhoto(BuildContext context) {
+    if (client.photoUrl == null) return;
+    
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.9),
+      builder: (context) {
+        return GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Stack(
+            children: [
+              InteractiveViewer(
+                child: Center(
+                  child: Image.network(
+                    client.photoUrl!,
+                    fit: BoxFit.contain,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 40.h,
+                right: 20.w,
+                child: Material(
+                  color: Colors.black54,
+                  shape: const CircleBorder(),
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final initials = _getInitials(client.fullName);
+    final avatarColor = _getAvatarColor(client.fullName);
+    final avatarTextColor = _getAvatarTextColor(client.fullName);
+    final formattedDate = client.createdAt != null
+        ? DateFormat('MMM dd, yyyy').format(client.createdAt!)
+        : 'Unknown Date';
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: AppColors.textSecondary,
+          ),
+          onPressed: () => context.pop(),
+        ),
+        title: CustomText(
+          'Client Profile',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 18.spMin,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.edit_outlined,
+              color: AppColors.primary,
+            ),
+            onPressed: () {
+              // Open NewClientRecordScreen in edit mode, passing client data
+              context.pushNamed(AppRoute.addClient.name, extra: client);
+            },
+          ),
+          12.horizontalSpace,
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 1. Profile Header block
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 72.r,
+                          height: 72.r,
+                          decoration: BoxDecoration(
+                            color: avatarColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              width: 0.5.w,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              initials,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 24.spMin,
+                                fontWeight: FontWeight.bold,
+                                color: avatarTextColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        20.horizontalSpace,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                client.fullName,
+                                style: GoogleFonts.playfairDisplay(
+                                  fontSize: 24.spMin,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              4.verticalSpace,
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.phone_outlined,
+                                    size: 16.r,
+                                    color: AppColors.textBody,
+                                  ),
+                                  6.horizontalSpace,
+                                  CustomText(
+                                    client.phoneNumber ?? 'No phone number',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 14.spMin,
+                                      color: AppColors.textBody,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              8.verticalSpace,
+                              // Gender Badge
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 4.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: client.gender.toLowerCase() == 'male'
+                                      ? AppColors.primary.withValues(
+                                          alpha: 0.08,
+                                        )
+                                      : Colors.pink.withValues(
+                                          alpha: 0.08,
+                                        ),
+                                  borderRadius: BorderRadius.circular(20.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      client.gender.toLowerCase() == 'male'
+                                          ? Icons.male
+                                          : Icons.female,
+                                      size: 14.r,
+                                      color: client.gender.toLowerCase() == 'male'
+                                          ? AppColors.primary
+                                          : Colors.pink[400],
+                                    ),
+                                    4.horizontalSpace,
+                                    CustomText(
+                                      client.gender[0].toUpperCase() +
+                                          client.gender.substring(1),
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 12.spMin,
+                                        fontWeight: FontWeight.bold,
+                                        color: client.gender.toLowerCase() == 'male'
+                                            ? AppColors.primary
+                                            : Colors.pink[400],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    24.verticalSpace,
+
+                    // 2. Communication Actions
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF25D366), // WhatsApp Green
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                            icon: const Icon(Icons.share, color: Colors.white, size: 18),
+                            label: CustomText(
+                              'WhatsApp Share',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14.spMin,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            onPressed: () => _shareOnWhatsApp(context),
+                          ),
+                        ),
+                        16.horizontalSpace,
+                        Container(
+                          height: 48.r,
+                          width: 48.r,
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceWhite,
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(
+                              color: AppColors.placeholder.withValues(alpha: 0.8),
+                            ),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.phone_outlined,
+                              color: AppColors.primary,
+                            ),
+                            onPressed: () => _callClient(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                    24.verticalSpace,
+
+                    // 3. Style Photo Section
+                    CustomText(
+                      'Style Reference',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16.spMin,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    10.verticalSpace,
+                    client.photoUrl != null
+                        ? GestureDetector(
+                            onTap: () => _zoomPhoto(context),
+                            child: Container(
+                              height: 200.h,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16.r),
+                                border: Border.all(
+                                  color: AppColors.placeholder.withValues(
+                                    alpha: 0.8,
+                                  ),
+                                ),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Stack(
+                                children: [
+                                  Image.network(
+                                    client.photoUrl!,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          color: AppColors.primary,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Center(
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          color: AppColors.notification,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Positioned(
+                                    bottom: 12.h,
+                                    right: 12.w,
+                                    child: Container(
+                                      padding: EdgeInsets.all(6.r),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.zoom_in,
+                                        color: Colors.white,
+                                        size: 18.r,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Container(
+                            height: 120.h,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceWhite,
+                              borderRadius: BorderRadius.circular(16.r),
+                              border: Border.all(
+                                color: AppColors.placeholder.withValues(
+                                  alpha: 0.5,
+                                ),
+                                style: BorderStyle.solid,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.image_outlined,
+                                  color:
+                                      AppColors.textBody.withValues(alpha: 0.5),
+                                  size: 32.r,
+                                ),
+                                8.verticalSpace,
+                                CustomText(
+                                  'No Style Reference Photo Uploaded',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 13.spMin,
+                                    color: AppColors.textBody,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                    24.verticalSpace,
+
+                    // 4. Measurements Header with last-updated timestamp
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(
+                              'Measurements',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 16.spMin,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            4.verticalSpace,
+                            CustomText(
+                              'Last updated: $formattedDate',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12.spMin,
+                                color: AppColors.textBody,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.placeholder.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: CustomText(
+                            'Inches',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12.spMin,
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    12.verticalSpace,
+
+                    // 5. Measurements Grid view
+                    client.measurements.isEmpty
+                        ? Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(vertical: 24.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceWhite,
+                              borderRadius: BorderRadius.circular(16.r),
+                              border: Border.all(
+                                color: AppColors.placeholder.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            ),
+                            child: Center(
+                              child: CustomText(
+                                'No measurements recorded.',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 14.spMin,
+                                  color: AppColors.textBody,
+                                ),
+                              ),
+                            ),
+                          )
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16.w,
+                              mainAxisSpacing: 12.h,
+                              childAspectRatio: 2.2,
+                            ),
+                            itemCount: client.measurements.length,
+                            itemBuilder: (context, index) {
+                              final key =
+                                  client.measurements.keys.elementAt(index);
+                              final value = client.measurements[key];
+
+                              return Container(
+                                padding: EdgeInsets.all(12.r),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceWhite,
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                    color: AppColors.placeholder.withValues(
+                                      alpha: 0.8,
+                                    ),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CustomText(
+                                      key,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 13.spMin,
+                                        color: AppColors.textBody,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    4.verticalSpace,
+                                    CustomText(
+                                      '$value in',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 16.spMin,
+                                        color: AppColors.textSecondary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                    24.verticalSpace,
+
+                    // 6. Tailoring Notes Preference Card
+                    if (client.notes != null &&
+                        client.notes!.trim().isNotEmpty) ...[
+                      CustomText(
+                        'Tailoring Notes',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 16.spMin,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      10.verticalSpace,
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceWhite,
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: AppColors.placeholder.withValues(
+                              alpha: 0.8,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.format_quote_rounded,
+                              color: AppColors.primary.withValues(alpha: 0.4),
+                              size: 24.r,
+                            ),
+                            12.horizontalSpace,
+                            Expanded(
+                              child: CustomText(
+                                client.notes!,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 14.spMin,
+                                  color: AppColors.textSecondary,
+                                  height: 1.4,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      24.verticalSpace,
+                    ],
+                  ],
+                ),
+              ),
+            ),
+
+            // 7. Fixed Bottom Create New Order trigger button
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+              child: CustomButton(
+                text: 'Create New Order',
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: CustomText(
+                        'New Order creation for ${client.fullName} is coming soon in the next feature phase!',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Colors.white,
+                          fontSize: 14.spMin,
+                        ),
+                      ),
+                      backgroundColor: AppColors.primary,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -6,6 +6,7 @@ class Client {
   final String gender;
   final Map<String, double> measurements;
   final String? photoUrl;
+  final String? notes;
   final DateTime? createdAt;
 
   Client({
@@ -16,6 +17,7 @@ class Client {
     required this.gender,
     required this.measurements,
     this.photoUrl,
+    this.notes,
     this.createdAt,
   });
 
@@ -23,13 +25,14 @@ class Client {
   factory Client.fromJson(Map<String, dynamic> json) {
     final rawMeasurements = json['measurements'] as Map<String, dynamic>? ?? {};
     
-    // Extract photo URL from measurements metadata if it exists
+    // Extract photo URL and notes from measurements metadata if they exist
     final photoUrl = rawMeasurements['_photo_url'] as String?;
+    final notes = rawMeasurements['_notes'] as String?;
     
     // Filter out metadata keys to keep measurements strictly numeric
     final measurementsMap = <String, double>{};
     rawMeasurements.forEach((key, value) {
-      if (key != '_photo_url' && value is num) {
+      if (key != '_photo_url' && key != '_notes' && value is num) {
         measurementsMap[key] = value.toDouble();
       }
     });
@@ -42,6 +45,7 @@ class Client {
       gender: json['gender'] as String,
       measurements: measurementsMap,
       photoUrl: photoUrl,
+      notes: notes,
       createdAt: json['createdAt'] != null 
           ? DateTime.parse(json['createdAt'] as String)
           : null,
@@ -59,6 +63,7 @@ class Client {
       'measurements': {
         ...measurements,
         if (photoUrl != null) '_photo_url': photoUrl,
+        if (notes != null) '_notes': notes,
       },
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };
@@ -73,6 +78,7 @@ class Client {
     String? gender,
     Map<String, double>? measurements,
     String? photoUrl,
+    String? notes,
     DateTime? createdAt,
   }) {
     return Client(
@@ -83,6 +89,7 @@ class Client {
       gender: gender ?? this.gender,
       measurements: measurements ?? this.measurements,
       photoUrl: photoUrl ?? this.photoUrl,
+      notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
     );
   }

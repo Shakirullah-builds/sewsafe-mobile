@@ -44,6 +44,13 @@ class ClientRepository {
       // Pull measurements list relations
       final measurementsList = json['measurements'] as List<dynamic>? ?? [];
       
+      // Sort measurements in descending order of createdAt in Dart to ensure latest is first
+      measurementsList.sort((a, b) {
+        final aTime = DateTime.parse(a['createdAt'] as String);
+        final bTime = DateTime.parse(b['createdAt'] as String);
+        return bTime.compareTo(aTime);
+      });
+      
       // Extract the measurementData JSON from the latest measurement row
       Map<String, dynamic> measurementsJson = {};
       if (measurementsList.isNotEmpty) {
@@ -55,9 +62,48 @@ class ClientRepository {
       return Client.fromJson(clientMap);
     }).toList();
   }
+
+  /// Updates an existing client record and their latest measurements
+  Future<void> updateClient(Client client) async {
+    // 1. Update basic metadata in 'clients' table
+    await _supabase.from('clients').update({
+      'fullName': client.fullName,
+      'phoneNumber': client.phoneNumber,
+      'gender': client.gender,
+    }).eq('id', client.id!);
+
+    // 2. Fetch the latest measurement row for this client to get its ID
+    final measurementsResponse = await _supabase
+        .from('measurements')
+        .select('id')
+        .eq('clientsId', client.id!)
+        .order('createdAt', ascending: false)
+        .limit(1);
+
+    if (measurementsResponse.isNotEmpty) {
+      final latestId = measurementsResponse.first['id'];
+      // Update that specific measurement row
+      await _supabase.from('measurements').update({
+        'measurementData': {
+          ...client.measurements,
+          if (client.photoUrl != null) '_photo_url': client.photoUrl,
+        },
+      }).eq('id', latestId);
+    } else {
+      // Fallback: If no measurement row exists, insert one
+      await _supabase.from('measurements').insert({
+        'clientsId': client.id!,
+        'measurementData': {
+          ...client.measurements,
+          if (client.photoUrl != null) '_photo_url': client.photoUrl,
+        },
+      });
+    }
+  }
 }
 
 /// Standard Riverpod Provider for ClientRepository
 final clientRepositoryProvider = Provider<ClientRepository>((ref) {
   return ClientRepository(Supabase.instance.client);
 });
+

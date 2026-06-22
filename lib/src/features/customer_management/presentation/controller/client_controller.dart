@@ -1,9 +1,16 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/data/repositories/client_repository.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'client_controller.g.dart';
+
+@riverpod
+Future<List<Client>> clientsList(Ref ref) async {
+  final repository = ref.watch(clientRepositoryProvider);
+  return repository.getClients();
+}
 
 @riverpod
 class ClientController extends _$ClientController {
@@ -20,6 +27,7 @@ class ClientController extends _$ClientController {
     required String gender,
     required Map<String, double> measurements,
     String? photoUrl,
+    String? notes,
   }) async {
     state = const AsyncValue.loading();
     
@@ -37,9 +45,49 @@ class ClientController extends _$ClientController {
         gender: gender,
         measurements: measurements,
         photoUrl: photoUrl,
+        notes: notes,
       );
 
       await repository.createClient(client);
+      ref.invalidate(clientsListProvider);
+    });
+
+    return !state.hasError;
+  }
+
+  /// Updates an existing client record and updates state accordingly.
+  /// Returns [true] if successful, [false] otherwise.
+  Future<bool> editClient({
+    required String clientId,
+    required String fullName,
+    required String phoneNumber,
+    required String gender,
+    required Map<String, double> measurements,
+    String? photoUrl,
+    String? notes,
+  }) async {
+    state = const AsyncValue.loading();
+    
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(clientRepositoryProvider);
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        throw Exception('No logged-in tailor found. Please sign in again.');
+      }
+
+      final client = Client(
+        id: clientId,
+        userId: user.id,
+        fullName: fullName,
+        phoneNumber: phoneNumber.trim().isEmpty ? null : phoneNumber.trim(),
+        gender: gender,
+        measurements: measurements,
+        photoUrl: photoUrl,
+        notes: notes,
+      );
+
+      await repository.updateClient(client);
+      ref.invalidate(clientsListProvider);
     });
 
     return !state.hasError;
