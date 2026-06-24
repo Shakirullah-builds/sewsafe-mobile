@@ -9,6 +9,7 @@ import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_empty_state.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_svg.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
+import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
 import 'package:sewsafe_mobile/src/features/auth/backend/data/auth_repository.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/presentation/controller/client_controller.dart';
@@ -200,7 +201,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ],
                       ),
-                      child: TextField(
+                      child: CustomTextField(
                         controller: _searchController,
                         onChanged: (val) {
                           setState(() {
@@ -212,36 +213,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           color: AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
-                        decoration: InputDecoration(
-                          hintText: 'Search clients or measurements...',
-                          hintStyle: GoogleFonts.plusJakartaSans(
-                            fontSize: 14.spMin,
-                            color: AppColors.textBody.withValues(alpha: 0.6),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: AppColors.textBody,
-                            size: 20.r,
-                          ),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: Icon(Icons.clear, size: 18.r),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    setState(() {
-                                      _homeSearchQuery = '';
-                                    });
-                                  },
-                                )
-                              : null,
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 14.h,
-                          ),
+                        hintText: 'Search clients or measurements...',
+                        hintStyle: GoogleFonts.plusJakartaSans(
+                          fontSize: 14.spMin,
+                          color: AppColors.textBody.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: AppColors.textBody,
+                          size: 20.r,
+                        ),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(Icons.clear, size: 18.r),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _homeSearchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                        filled: false,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 14.h,
                         ),
                       ),
                     ),

@@ -7,6 +7,7 @@ class Client {
   final Map<String, double> measurements;
   final String? photoUrl;
   final String? notes;
+  final List<Map<String, String>>? stylePhotos;
   final DateTime? createdAt;
 
   Client({
@@ -18,6 +19,7 @@ class Client {
     required this.measurements,
     this.photoUrl,
     this.notes,
+    this.stylePhotos,
     this.createdAt,
   });
 
@@ -25,14 +27,27 @@ class Client {
   factory Client.fromJson(Map<String, dynamic> json) {
     final rawMeasurements = json['measurements'] as Map<String, dynamic>? ?? {};
     
-    // Extract photo URL and notes from measurements metadata if they exist
+    // Extract photo URL, notes and style photos history from measurements metadata
     final photoUrl = rawMeasurements['_photo_url'] as String?;
     final notes = rawMeasurements['_notes'] as String?;
+    
+    final rawStylePhotos = rawMeasurements['_style_photos'] as List<dynamic>?;
+    final List<Map<String, String>> stylePhotosList = [];
+    if (rawStylePhotos != null) {
+      for (final item in rawStylePhotos) {
+        if (item is Map) {
+          stylePhotosList.add({
+            'url': item['url']?.toString() ?? '',
+            'uploadedAt': item['uploadedAt']?.toString() ?? '',
+          });
+        }
+      }
+    }
     
     // Filter out metadata keys to keep measurements strictly numeric
     final measurementsMap = <String, double>{};
     rawMeasurements.forEach((key, value) {
-      if (key != '_photo_url' && key != '_notes' && value is num) {
+      if (key != '_photo_url' && key != '_notes' && key != '_style_photos' && value is num) {
         measurementsMap[key] = value.toDouble();
       }
     });
@@ -46,6 +61,7 @@ class Client {
       measurements: measurementsMap,
       photoUrl: photoUrl,
       notes: notes,
+      stylePhotos: stylePhotosList.isEmpty ? null : stylePhotosList,
       createdAt: json['createdAt'] != null 
           ? DateTime.parse(json['createdAt'] as String)
           : null,
@@ -64,6 +80,7 @@ class Client {
         ...measurements,
         if (photoUrl != null) '_photo_url': photoUrl,
         if (notes != null) '_notes': notes,
+        if (stylePhotos != null) '_style_photos': stylePhotos,
       },
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };
@@ -79,6 +96,7 @@ class Client {
     Map<String, double>? measurements,
     String? photoUrl,
     String? notes,
+    List<Map<String, String>>? stylePhotos,
     DateTime? createdAt,
   }) {
     return Client(
@@ -90,6 +108,7 @@ class Client {
       measurements: measurements ?? this.measurements,
       photoUrl: photoUrl ?? this.photoUrl,
       notes: notes ?? this.notes,
+      stylePhotos: stylePhotos ?? this.stylePhotos,
       createdAt: createdAt ?? this.createdAt,
     );
   }

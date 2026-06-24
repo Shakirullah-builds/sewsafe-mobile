@@ -9,6 +9,7 @@ import 'package:sewsafe_mobile/src/features/auth/backend/data/auth_repository.da
 import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/presentation/screens/new_client_record_screen.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/presentation/screens/client_details_screen.dart';
+import 'package:sewsafe_mobile/src/features/customer_management/presentation/screens/client_style_gallery_screen.dart';
 
 // 1. Route Enums: You will never type a raw string like '/home' again.
 enum AppRoute {
@@ -19,6 +20,7 @@ enum AppRoute {
   home,
   addClient,
   clientDetails,
+  clientStyleGallery,
   forgotPassword,
   verifyPasswordReset,
   verifyEmail
@@ -87,6 +89,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final client = state.extra as Client;
           return ClientDetailsScreen(client: client);
+        },
+      ),
+      GoRoute(
+        path: '/client-style-gallery',
+        name: AppRoute.clientStyleGallery.name,
+        builder: (context, state) {
+          final client = state.extra as Client;
+          return ClientStyleGalleryScreen(client: client);
         },
       ),
       GoRoute(

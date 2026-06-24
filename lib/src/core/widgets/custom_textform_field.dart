@@ -15,6 +15,15 @@ class CustomTextField extends StatelessWidget {
   final int? maxLength;
   final bool readOnly;
   final String? headerText;
+  final bool? filled;
+  final Color? fillColor;
+  final InputBorder? border;
+  final InputBorder? enabledBorder;
+  final InputBorder? focusedBorder;
+  final EdgeInsetsGeometry? contentPadding;
+  final TextStyle? hintStyle;
+  final TextStyle? style;
+  final ValueChanged<String>? onChanged;
 
   const CustomTextField({
     super.key,
@@ -29,6 +38,15 @@ class CustomTextField extends StatelessWidget {
     this.maxLength,
     this.readOnly = false,
     this.headerText,
+    this.filled,
+    this.fillColor,
+    this.border,
+    this.enabledBorder,
+    this.focusedBorder,
+    this.contentPadding,
+    this.hintStyle,
+    this.style,
+    this.onChanged,
   });
 
   @override
@@ -37,15 +55,17 @@ class CustomTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CustomText(
-          headerText ?? '',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontSize: 14.spMin,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w500,
+        if (headerText != null && headerText!.isNotEmpty) ...[
+          CustomText(
+            headerText!,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontSize: 14.spMin,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
-        5.verticalSpace,
+          5.verticalSpace,
+        ],
         TextFormField(
           controller: controller,
           validator: validator,
@@ -54,19 +74,24 @@ class CustomTextField extends StatelessWidget {
           maxLines: obscureText ? 1 : maxLines, // Passwords must be 1 line
           maxLength: maxLength,
           readOnly: readOnly,
+          onChanged: onChanged,
           // Automatically uses the base font from AppTheme!
-          style: theme.inputDecorationTheme.labelStyle,
+          style: style ?? theme.inputDecorationTheme.labelStyle,
           decoration: InputDecoration(
-            hintStyle: theme.inputDecorationTheme.hintStyle,
+            filled: filled,
+            fillColor: fillColor,
+            hintStyle: hintStyle ?? theme.inputDecorationTheme.hintStyle,
             hintText: hintText,
             suffixIcon: suffixIcon,
             prefixIcon: prefixIcon,
-            // Notice we DO NOT define borders, fill colors, or padding here.
-            // Flutter will automatically reach into your AppTheme and apply
-            // the perfect inputDecorationTheme you already wrote!
+            border: border,
+            enabledBorder: enabledBorder,
+            focusedBorder: focusedBorder,
+            contentPadding: contentPadding,
           ),
         ),
       ],
     );
   }
 }
+

@@ -7,6 +7,7 @@ import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_empty_state.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
+import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_icons.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/presentation/controller/client_controller.dart';
@@ -133,7 +134,7 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                     ),
                   ],
                 ),
-                child: TextField(
+                child: CustomTextField(
                   controller: _searchController,
                   onChanged: (val) {
                     ref.read(clientsSearchQueryProvider.notifier).state = val;
@@ -143,35 +144,34 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
-                  decoration: InputDecoration(
-                    hintText: 'Search clients by name or phone...',
-                    hintStyle: GoogleFonts.plusJakartaSans(
-                      fontSize: 14.spMin,
-                      color: AppColors.textBody.withValues(alpha: 0.6),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: AppColors.textBody,
-                      size: 20.r,
-                    ),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(Icons.clear, size: 18.r),
-                            onPressed: () {
-                              _searchController.clear();
-                              ref
-                                  .read(clientsSearchQueryProvider.notifier)
-                                  .state = '';
-                            },
-                          )
-                        : null,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  hintText: 'Search clients by name or phone...',
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    fontSize: 14.spMin,
+                    color: AppColors.textBody.withValues(alpha: 0.6),
+                    fontWeight: FontWeight.w500,
                   ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: AppColors.textBody,
+                    size: 20.r,
+                  ),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(Icons.clear, size: 18.r),
+                          onPressed: () {
+                            _searchController.clear();
+                            ref
+                                .read(clientsSearchQueryProvider.notifier)
+                                .state = '';
+                          },
+                        )
+                      : null,
+                  filled: false,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 ),
               ),
               24.verticalSpace,

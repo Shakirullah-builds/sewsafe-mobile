@@ -28,6 +28,7 @@ class ClientController extends _$ClientController {
     required Map<String, double> measurements,
     String? photoUrl,
     String? notes,
+    List<Map<String, String>>? stylePhotos,
   }) async {
     state = const AsyncValue.loading();
     
@@ -46,6 +47,7 @@ class ClientController extends _$ClientController {
         measurements: measurements,
         photoUrl: photoUrl,
         notes: notes,
+        stylePhotos: stylePhotos,
       );
 
       await repository.createClient(client);
@@ -65,6 +67,7 @@ class ClientController extends _$ClientController {
     required Map<String, double> measurements,
     String? photoUrl,
     String? notes,
+    List<Map<String, String>>? stylePhotos,
   }) async {
     state = const AsyncValue.loading();
     
@@ -84,6 +87,7 @@ class ClientController extends _$ClientController {
         measurements: measurements,
         photoUrl: photoUrl,
         notes: notes,
+        stylePhotos: stylePhotos,
       );
 
       await repository.updateClient(client);

@@ -25,6 +25,8 @@ class ClientRepository {
       'measurementData': {
         ...client.measurements,
         if (client.photoUrl != null) '_photo_url': client.photoUrl,
+        if (client.notes != null) '_notes': client.notes,
+        if (client.stylePhotos != null) '_style_photos': client.stylePhotos,
       },
     });
   }
@@ -87,6 +89,8 @@ class ClientRepository {
         'measurementData': {
           ...client.measurements,
           if (client.photoUrl != null) '_photo_url': client.photoUrl,
+          if (client.notes != null) '_notes': client.notes,
+          if (client.stylePhotos != null) '_style_photos': client.stylePhotos,
         },
       }).eq('id', latestId);
     } else {
@@ -96,6 +100,8 @@ class ClientRepository {
         'measurementData': {
           ...client.measurements,
           if (client.photoUrl != null) '_photo_url': client.photoUrl,
+          if (client.notes != null) '_notes': client.notes,
+          if (client.stylePhotos != null) '_style_photos': client.stylePhotos,
         },
       });
     }

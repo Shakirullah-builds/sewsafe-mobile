@@ -63,6 +63,11 @@
     <string>SewSafe needs camera access to capture fabric and style details.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>SewSafe needs gallery access to upload reference images.</string>
-
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>whatsapp</string>
+		<string>https</string>
+	</array>
 </dict>
 </plist>

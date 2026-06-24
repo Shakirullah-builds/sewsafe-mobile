@@ -44,6 +44,7 @@ class ClientDetailsScreen extends StatelessWidget {
         const SnackBar(
           content: CustomText('Cannot share: Client has no phone number saved.', color: Colors.white),
           backgroundColor: AppColors.notification,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -86,6 +87,7 @@ class ClientDetailsScreen extends StatelessWidget {
           SnackBar(
             content: CustomText('Could not open WhatsApp: $e', color: Colors.white),
             backgroundColor: AppColors.notification,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -99,6 +101,7 @@ class ClientDetailsScreen extends StatelessWidget {
         const SnackBar(
           content: CustomText('Cannot call: Client has no phone number saved.', color: Colors.white),
           backgroundColor: AppColors.notification,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -108,17 +111,15 @@ class ClientDetailsScreen extends StatelessWidget {
     final url = Uri.parse('tel:$cleanPhone');
 
     try {
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url);
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: CustomText('Your device cannot place phone calls directly.', color: Colors.white),
-              backgroundColor: AppColors.notification,
-            ),
-          );
-        }
+      final launched = await launchUrl(url, mode: LaunchMode.externalApplication);
+      if (!launched && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: CustomText('Your device cannot place phone calls directly.', color: Colors.white),
+            backgroundColor: AppColors.notification,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     } catch (e) {
       if (context.mounted) {
@@ -126,52 +127,14 @@ class ClientDetailsScreen extends StatelessWidget {
           SnackBar(
             content: CustomText('Could not trigger call: $e', color: Colors.white),
             backgroundColor: AppColors.notification,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
     }
   }
 
-  /// Displays full-screen image overlay modal on tap
-  void _zoomPhoto(BuildContext context) {
-    if (client.photoUrl == null) return;
-    
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.9),
-      builder: (context) {
-        return GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Stack(
-            children: [
-              InteractiveViewer(
-                child: Center(
-                  child: Image.network(
-                    client.photoUrl!,
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 40.h,
-                right: 20.w,
-                child: Material(
-                  color: Colors.black54,
-                  shape: const CircleBorder(),
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -181,6 +144,29 @@ class ClientDetailsScreen extends StatelessWidget {
     final formattedDate = client.createdAt != null
         ? DateFormat('MMM dd, yyyy').format(client.createdAt!)
         : 'Unknown Date';
+
+    final List<Map<String, String>> allPhotos = [];
+    if (client.stylePhotos != null) {
+      allPhotos.addAll(client.stylePhotos!);
+    } else if (client.photoUrl != null) {
+      allPhotos.add({
+        'url': client.photoUrl!,
+        'uploadedAt': client.createdAt != null
+            ? client.createdAt!.toIso8601String()
+            : DateTime.now().toIso8601String(),
+      });
+    }
+
+    String lastUploadDate = 'Date unknown';
+    if (allPhotos.isNotEmpty) {
+      final uploadedAtStr = allPhotos.last['uploadedAt'];
+      if (uploadedAtStr != null && uploadedAtStr.isNotEmpty) {
+        try {
+          final date = DateTime.parse(uploadedAtStr);
+          lastUploadDate = 'Uploaded on ${DateFormat('MMM dd, yyyy').format(date)}';
+        } catch (_) {}
+      }
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -384,110 +370,181 @@ class ClientDetailsScreen extends StatelessWidget {
                     ),
                     24.verticalSpace,
 
-                    // 3. Style Photo Section
-                    CustomText(
-                      'Style Reference',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 16.spMin,
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    // 3. Style Gallery Preview Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomText(
+                          'Style References',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16.spMin,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (allPhotos.isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              context.pushNamed(
+                                AppRoute.clientStyleGallery.name,
+                                extra: client,
+                              );
+                            },
+                            child: CustomText(
+                              'View Gallery (${allPhotos.length})',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13.spMin,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     10.verticalSpace,
-                    client.photoUrl != null
-                        ? GestureDetector(
-                            onTap: () => _zoomPhoto(context),
-                            child: Container(
-                              height: 200.h,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.r),
-                                border: Border.all(
-                                  color: AppColors.placeholder.withValues(
-                                    alpha: 0.8,
-                                  ),
-                                ),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Stack(
-                                children: [
-                                  Image.network(
-                                    client.photoUrl!,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return const Center(
-                                        child: CircularProgressIndicator(
-                                          color: AppColors.primary,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Center(
-                                        child: Icon(
-                                          Icons.broken_image,
-                                          color: AppColors.notification,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  Positioned(
-                                    bottom: 12.h,
-                                    right: 12.w,
-                                    child: Container(
-                                      padding: EdgeInsets.all(6.r),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black54,
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceWhite,
+                        borderRadius: BorderRadius.circular(16.r),
+                        border: Border.all(
+                          color: AppColors.placeholder.withValues(alpha: 0.8),
+                        ),
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16.r),
+                        onTap: () {
+                          context.pushNamed(
+                            AppRoute.clientStyleGallery.name,
+                            extra: client,
+                          );
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(16.r),
+                          child: allPhotos.isEmpty
+                              ? Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(12.r),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.placeholder.withValues(alpha: 0.3),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(
-                                        Icons.zoom_in,
-                                        color: Colors.white,
-                                        size: 18.r,
+                                        Icons.image_outlined,
+                                        color: AppColors.textBody,
+                                        size: 24.r,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : Container(
-                            height: 120.h,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: AppColors.surfaceWhite,
-                              borderRadius: BorderRadius.circular(16.r),
-                              border: Border.all(
-                                color: AppColors.placeholder.withValues(
-                                  alpha: 0.5,
+                                    16.horizontalSpace,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          CustomText(
+                                            'No style references saved',
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontSize: 14.spMin,
+                                              color: AppColors.textSecondary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          2.verticalSpace,
+                                          CustomText(
+                                            'Upload photos to keep track of styles.',
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontSize: 12.spMin,
+                                              color: AppColors.textBody,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.add_photo_alternate_outlined,
+                                      color: AppColors.primary,
+                                      size: 20.r,
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    // Thumbnail of the latest image
+                                    Container(
+                                      width: 56.r,
+                                      height: 56.r,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12.r),
+                                        color: AppColors.placeholder.withValues(alpha: 0.2),
+                                      ),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: Image.network(
+                                        allPhotos.last['url'] ?? '',
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: AppColors.primary,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (context, error, stackTrace) => Icon(
+                                          Icons.broken_image,
+                                          color: AppColors.notification,
+                                          size: 20.r,
+                                        ),
+                                      ),
+                                    ),
+                                    16.horizontalSpace,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          CustomText(
+                                            'Latest Reference',
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontSize: 14.spMin,
+                                              color: AppColors.textSecondary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          2.verticalSpace,
+                                          CustomText(
+                                            lastUploadDate,
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontSize: 12.spMin,
+                                              color: AppColors.textBody,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CustomText(
+                                          'Open Gallery',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 12.spMin,
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        4.horizontalSpace,
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 12.r,
+                                          color: AppColors.primary,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                style: BorderStyle.solid,
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.image_outlined,
-                                  color:
-                                      AppColors.textBody.withValues(alpha: 0.5),
-                                  size: 32.r,
-                                ),
-                                8.verticalSpace,
-                                CustomText(
-                                  'No Style Reference Photo Uploaded',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 13.spMin,
-                                    color: AppColors.textBody,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        ),
+                      ),
+                    ),
                     24.verticalSpace,
 
                     // 4. Measurements Header with last-updated timestamp
@@ -689,6 +746,7 @@ class ClientDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       backgroundColor: AppColors.primary,
+                      behavior: SnackBarBehavior.floating,
                     ),
                   );
                 },

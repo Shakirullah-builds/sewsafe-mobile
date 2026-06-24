@@ -291,6 +291,7 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
               measurements: measurements,
               photoUrl: photoUrlToUse,
               notes: notes.isEmpty ? null : notes,
+              stylePhotos: widget.client?.stylePhotos,
             )
         : await ref
             .read(clientControllerProvider.notifier)
