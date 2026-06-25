@@ -25,6 +25,23 @@ class ClientStyleGalleryScreen extends ConsumerStatefulWidget {
 class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScreen> {
   final ImagePicker _picker = ImagePicker();
   bool _isUploading = false;
+  String _loadingText = 'Uploading Style Photo...';
+
+  /// Generates a human-friendly string for the day header
+  String _formatGroupDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final targetDate = DateTime(date.year, date.month, date.day);
+
+    if (targetDate == today) {
+      return 'Today';
+    } else if (targetDate == yesterday) {
+      return 'Yesterday';
+    } else {
+      return DateFormat('MMMM dd, yyyy').format(date);
+    }
+  }
 
   /// Handles photo uploads, database updates, and error alerts
   Future<void> _uploadNewPhoto(Client client) async {
@@ -35,7 +52,10 @@ class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScr
       );
       if (image == null) return;
 
-      setState(() => _isUploading = true);
+      setState(() {
+        _loadingText = 'Uploading Style Photo...';
+        _isUploading = true;
+      });
 
       final supabase = Supabase.instance.client;
       final user = supabase.auth.currentUser;
@@ -73,14 +93,14 @@ class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScr
       }
       updatedStylePhotos.add(newPhotoItem);
 
-      // Save to database by calling editClient
+      // Save to database by calling editClient, preserving profile avatar
       final success = await ref.read(clientControllerProvider.notifier).editClient(
         clientId: client.id!,
         fullName: client.fullName,
         phoneNumber: client.phoneNumber ?? '',
         gender: client.gender,
         measurements: client.measurements,
-        photoUrl: newPhotoUrl, // Update photoUrl to latest uploaded style
+        photoUrl: client.photoUrl, // Preserve profile picture url
         notes: client.notes,
         stylePhotos: updatedStylePhotos,
       );
@@ -166,7 +186,10 @@ class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScr
 
     if (confirm != true) return;
 
-    setState(() => _isUploading = true);
+    setState(() {
+      _loadingText = 'Deleting Style Photo...';
+      _isUploading = true;
+    });
 
     try {
       final List<Map<String, String>> updatedStylePhotos = [];
@@ -182,20 +205,14 @@ class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScr
       // Remove photo item
       updatedStylePhotos.removeWhere((item) => item['url'] == photoItem['url']);
 
-      // Update primary photoUrl to represent the latest photo remaining (or null if empty)
-      String? updatedPhotoUrl;
-      if (updatedStylePhotos.isNotEmpty) {
-        updatedPhotoUrl = updatedStylePhotos.last['url'];
-      }
-
-      // Save to database
+      // Save to database, keeping photoUrl preserved to avoid profile photo overrides
       final success = await ref.read(clientControllerProvider.notifier).editClient(
         clientId: client.id!,
         fullName: client.fullName,
         phoneNumber: client.phoneNumber ?? '',
         gender: client.gender,
         measurements: client.measurements,
-        photoUrl: updatedPhotoUrl,
+        photoUrl: client.photoUrl, // Keep profile picture unchanged
         notes: client.notes,
         stylePhotos: updatedStylePhotos.isEmpty ? null : updatedStylePhotos,
       );
@@ -308,6 +325,9 @@ class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScr
 
   @override
   Widget build(BuildContext context) {
+    // Watch client controller to keep the autoDispose notifier alive
+    ref.watch(clientControllerProvider);
+
     // Listen to real-time updates of the client list in order to auto-update style images
     final clientsAsync = ref.watch(clientsListProvider);
     final client = clientsAsync.maybeWhen(
@@ -326,9 +346,38 @@ class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScr
       });
     }
 
+    // Group photos by day: e.g., Map<DateTime, List<Map<String, String>>>
+    final Map<DateTime, List<Map<String, String>>> tempGroups = {};
+    for (final photo in allPhotos) {
+      final uploadedAtStr = photo['uploadedAt'];
+      DateTime day = DateTime(1970, 1, 1);
+      if (uploadedAtStr != null && uploadedAtStr.isNotEmpty) {
+        try {
+          final date = DateTime.parse(uploadedAtStr);
+          day = DateTime(date.year, date.month, date.day);
+        } catch (_) {}
+      }
+      if (!tempGroups.containsKey(day)) {
+        tempGroups[day] = [];
+      }
+      tempGroups[day]!.add(photo);
+    }
+
+    // Sort the days in descending order
+    final sortedDays = tempGroups.keys.toList()..sort((a, b) => b.compareTo(a));
+
+    // Sort photos within each day descending
+    for (final day in sortedDays) {
+      tempGroups[day]!.sort((a, b) {
+        final aTimeStr = a['uploadedAt'] ?? '';
+        final bTimeStr = b['uploadedAt'] ?? '';
+        return bTimeStr.compareTo(aTimeStr);
+      });
+    }
+
     return LoadingOverlay(
       isLoading: _isUploading,
-      loadingText: 'Uploading Style Photo...',
+      loadingText: _loadingText,
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
@@ -387,133 +436,144 @@ class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScr
                     ),
                   ),
                 )
-              : Padding(
-                  padding: EdgeInsets.all(24.r),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        '${client.fullName}\'s References (${allPhotos.length})',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 16.spMin,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      16.verticalSpace,
-                      Expanded(
-                        child: GridView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16.w,
-                            mainAxisSpacing: 16.h,
-                            childAspectRatio: 0.82,
+              : ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                  itemCount: sortedDays.length + 1, // +1 for the header
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 20.h),
+                        child: CustomText(
+                          '${client.fullName}\'s References (${allPhotos.length})',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16.spMin,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary,
                           ),
-                          itemCount: allPhotos.length,
-                          itemBuilder: (context, index) {
-                            final photoItem = allPhotos[index];
-                            String uploadDateStr = 'Uploaded date unknown';
-                            if (photoItem['uploadedAt'] != null && photoItem['uploadedAt']!.isNotEmpty) {
-                              try {
-                                final date = DateTime.parse(photoItem['uploadedAt']!);
-                                uploadDateStr = DateFormat('MMM dd, yyyy').format(date);
-                              } catch (_) {}
-                            }
+                        ),
+                      );
+                    }
 
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceWhite,
-                                borderRadius: BorderRadius.circular(16.r),
-                                border: Border.all(color: AppColors.placeholder.withValues(alpha: 0.8)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.02),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
+                    final day = sortedDays[index - 1];
+                    final dayPhotos = tempGroups[day]!;
+                    final formattedGroupDate = _formatGroupDate(day);
+
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 24.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Sticky-like Day Subheader
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today_outlined,
+                                size: 14.r,
+                                color: AppColors.primary,
                               ),
-                              clipBehavior: Clip.antiAlias,
-                              child: InkWell(
-                                onTap: () => _zoomPhoto(context, client, photoItem),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          Image.network(
-                                            photoItem['url'] ?? '',
-                                            fit: BoxFit.cover,
-                                            loadingBuilder: (context, child, loadingProgress) {
-                                              if (loadingProgress == null) return child;
-                                              return const Center(
-                                                child: CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  color: AppColors.primary,
-                                                ),
-                                              );
-                                            },
-                                            errorBuilder: (context, error, stackTrace) => const Center(
-                                              child: Icon(Icons.broken_image, color: AppColors.notification),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 8.h,
-                                            right: 8.w,
-                                            child: Container(
-                                              decoration: const BoxDecoration(
-                                                color: Colors.black45,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: IconButton(
-                                                padding: EdgeInsets.zero,
-                                                constraints: BoxConstraints.tight(Size(28.r, 28.r)),
-                                                icon: const Icon(Icons.delete_outline, color: Colors.white, size: 16),
-                                                onPressed: () => _deletePhoto(client, photoItem),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(12.r),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Icon(Icons.calendar_today_outlined, size: 10.r, color: AppColors.textBody),
-                                              6.horizontalSpace,
-                                              Expanded(
-                                                child: CustomText(
-                                                  uploadDateStr,
-                                                  style: GoogleFonts.plusJakartaSans(
-                                                    fontSize: 11.spMin,
-                                                    color: AppColors.textBody,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                              8.horizontalSpace,
+                              CustomText(
+                                formattedGroupDate,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 14.spMin,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              12.horizontalSpace,
+                              Expanded(
+                                child: Divider(
+                                  color: AppColors.placeholder.withValues(alpha: 0.5),
+                                  thickness: 0.8.h,
+                                ),
+                              ),
+                            ],
+                          ),
+                          14.verticalSpace,
+                          // Nested GridView for the day's photos
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12.w,
+                              mainAxisSpacing: 12.h,
+                              childAspectRatio: 1.0,
+                            ),
+                            itemCount: dayPhotos.length,
+                            itemBuilder: (context, gridIndex) {
+                              final photoItem = dayPhotos[gridIndex];
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceWhite,
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  border: Border.all(
+                                    color: AppColors.placeholder.withValues(alpha: 0.8),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.02),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
                                     ),
                                   ],
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                                clipBehavior: Clip.antiAlias,
+                                child: InkWell(
+                                  onTap: () => _zoomPhoto(context, client, photoItem),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      Image.network(
+                                        photoItem['url'] ?? '',
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: AppColors.primary,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (context, error, stackTrace) => const Center(
+                                          child: Icon(
+                                            Icons.broken_image,
+                                            color: AppColors.notification,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 8.h,
+                                        right: 8.w,
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.black45,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: IconButton(
+                                            padding: EdgeInsets.zero,
+                                            constraints: BoxConstraints.tight(Size(28.r, 28.r)),
+                                            icon: const Icon(
+                                              Icons.delete_outline,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                            onPressed: () => _deletePhoto(client, photoItem),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
         ),
       ),
