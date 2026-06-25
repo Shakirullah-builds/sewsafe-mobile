@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,10 +8,11 @@ import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
+import 'package:sewsafe_mobile/src/features/customer_management/presentation/controller/client_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
-class ClientDetailsScreen extends StatelessWidget {
+class ClientDetailsScreen extends ConsumerWidget {
   final Client client;
 
   const ClientDetailsScreen({super.key, required this.client});
@@ -38,8 +40,8 @@ class ClientDetailsScreen extends StatelessWidget {
   }
 
   /// Opens WhatsApp with a pre-filled list of measurements
-  Future<void> _shareOnWhatsApp(BuildContext context) async {
-    if (client.phoneNumber == null || client.phoneNumber!.trim().isEmpty) {
+  Future<void> _shareOnWhatsApp(BuildContext context, Client liveClient) async {
+    if (liveClient.phoneNumber == null || liveClient.phoneNumber!.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: CustomText('Cannot share: Client has no phone number saved.', color: Colors.white),
@@ -51,17 +53,17 @@ class ClientDetailsScreen extends StatelessWidget {
     }
 
     final buffer = StringBuffer();
-    buffer.writeln('Hello ${client.fullName},');
+    buffer.writeln('Hello ${liveClient.fullName},');
     buffer.writeln('Here are your body measurements recorded on SewSafe:');
     buffer.writeln();
     
-    client.measurements.forEach((key, value) {
+    liveClient.measurements.forEach((key, value) {
       buffer.writeln('• $key: $value in');
     });
 
-    if (client.notes != null && client.notes!.trim().isNotEmpty) {
+    if (liveClient.notes != null && liveClient.notes!.trim().isNotEmpty) {
       buffer.writeln();
-      buffer.writeln('Notes: ${client.notes}');
+      buffer.writeln('Notes: ${liveClient.notes}');
     }
 
     buffer.writeln();
@@ -70,7 +72,7 @@ class ClientDetailsScreen extends StatelessWidget {
     final messageText = buffer.toString();
     
     // Sanitize phone number digits
-    final cleanPhone = client.phoneNumber!.replaceAll(RegExp(r'[^\d+]'), '');
+    final cleanPhone = liveClient.phoneNumber!.replaceAll(RegExp(r'[^\d+]'), '');
     final urlString = 'https://wa.me/${cleanPhone.replaceFirst('+', '')}?text=${Uri.encodeComponent(messageText)}';
     final url = Uri.parse(urlString);
 
@@ -95,8 +97,8 @@ class ClientDetailsScreen extends StatelessWidget {
   }
 
   /// Initiates a standard phone call
-  Future<void> _callClient(BuildContext context) async {
-    if (client.phoneNumber == null || client.phoneNumber!.trim().isEmpty) {
+  Future<void> _callClient(BuildContext context, Client liveClient) async {
+    if (liveClient.phoneNumber == null || liveClient.phoneNumber!.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: CustomText('Cannot call: Client has no phone number saved.', color: Colors.white),
@@ -107,7 +109,7 @@ class ClientDetailsScreen extends StatelessWidget {
       return;
     }
 
-    final cleanPhone = client.phoneNumber!.replaceAll(RegExp(r'[^\d+]'), '');
+    final cleanPhone = liveClient.phoneNumber!.replaceAll(RegExp(r'[^\d+]'), '');
     final url = Uri.parse('tel:$cleanPhone');
 
     try {
@@ -134,25 +136,30 @@ class ClientDetailsScreen extends StatelessWidget {
     }
   }
 
-
-
   @override
-  Widget build(BuildContext context) {
-    final initials = _getInitials(client.fullName);
-    final avatarColor = _getAvatarColor(client.fullName);
-    final avatarTextColor = _getAvatarTextColor(client.fullName);
-    final formattedDate = client.createdAt != null
-        ? DateFormat('MMM dd, yyyy').format(client.createdAt!)
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the live list of clients to ensure reactive updates propagate immediately
+    final clientsAsync = ref.watch(clientsListProvider);
+    final liveClient = clientsAsync.maybeWhen(
+      data: (list) => list.firstWhere((c) => c.id == client.id, orElse: () => client),
+      orElse: () => client,
+    );
+
+    final initials = _getInitials(liveClient.fullName);
+    final avatarColor = _getAvatarColor(liveClient.fullName);
+    final avatarTextColor = _getAvatarTextColor(liveClient.fullName);
+    final formattedDate = liveClient.createdAt != null
+        ? DateFormat('MMM dd, yyyy').format(liveClient.createdAt!)
         : 'Unknown Date';
 
     final List<Map<String, String>> allPhotos = [];
-    if (client.stylePhotos != null) {
-      allPhotos.addAll(client.stylePhotos!);
-    } else if (client.photoUrl != null) {
+    if (liveClient.stylePhotos != null) {
+      allPhotos.addAll(liveClient.stylePhotos!);
+    } else if (liveClient.photoUrl != null) {
       allPhotos.add({
-        'url': client.photoUrl!,
-        'uploadedAt': client.createdAt != null
-            ? client.createdAt!.toIso8601String()
+        'url': liveClient.photoUrl!,
+        'uploadedAt': liveClient.createdAt != null
+            ? liveClient.createdAt!.toIso8601String()
             : DateTime.now().toIso8601String(),
       });
     }
@@ -196,7 +203,7 @@ class ClientDetailsScreen extends StatelessWidget {
             ),
             onPressed: () {
               // Open NewClientRecordScreen in edit mode, passing client data
-              context.pushNamed(AppRoute.addClient.name, extra: client);
+              context.pushNamed(AppRoute.addClient.name, extra: liveClient);
             },
           ),
           12.horizontalSpace,
@@ -227,16 +234,43 @@ class ClientDetailsScreen extends StatelessWidget {
                               width: 0.5.w,
                             ),
                           ),
-                          child: Center(
-                            child: CustomText(
-                              initials,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 24.spMin,
-                                fontWeight: FontWeight.bold,
-                                color: avatarTextColor,
-                              ),
-                            ),
-                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: liveClient.photoUrl != null
+                              ? Image.network(
+                                  liveClient.photoUrl!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Center(
+                                      child: CustomText(
+                                        initials,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 24.spMin,
+                                          fontWeight: FontWeight.bold,
+                                          color: avatarTextColor,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primary,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Center(
+                                  child: CustomText(
+                                    initials,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 24.spMin,
+                                      fontWeight: FontWeight.bold,
+                                      color: avatarTextColor,
+                                    ),
+                                  ),
+                                ),
                         ),
                         20.horizontalSpace,
                         Expanded(
@@ -244,7 +278,7 @@ class ClientDetailsScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               CustomText(
-                                client.fullName,
+                                liveClient.fullName,
                                 style: GoogleFonts.playfairDisplay(
                                   fontSize: 24.spMin,
                                   fontWeight: FontWeight.bold,
@@ -261,7 +295,7 @@ class ClientDetailsScreen extends StatelessWidget {
                                   ),
                                   6.horizontalSpace,
                                   CustomText(
-                                    client.phoneNumber ?? 'No phone number',
+                                    liveClient.phoneNumber ?? 'No phone number',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 14.spMin,
                                       color: AppColors.textBody,
@@ -278,7 +312,7 @@ class ClientDetailsScreen extends StatelessWidget {
                                   vertical: 4.h,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: client.gender.toLowerCase() == 'male'
+                                  color: liveClient.gender.toLowerCase() == 'male'
                                       ? AppColors.primary.withValues(
                                           alpha: 0.08,
                                         )
@@ -291,22 +325,22 @@ class ClientDetailsScreen extends StatelessWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      client.gender.toLowerCase() == 'male'
+                                      liveClient.gender.toLowerCase() == 'male'
                                           ? Icons.male
                                           : Icons.female,
                                       size: 14.r,
-                                      color: client.gender.toLowerCase() == 'male'
+                                      color: liveClient.gender.toLowerCase() == 'male'
                                           ? AppColors.primary
                                           : Colors.pink[400],
                                     ),
                                     4.horizontalSpace,
                                     CustomText(
-                                      client.gender[0].toUpperCase() +
-                                          client.gender.substring(1),
+                                      liveClient.gender[0].toUpperCase() +
+                                          liveClient.gender.substring(1),
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 12.spMin,
                                         fontWeight: FontWeight.bold,
-                                        color: client.gender.toLowerCase() == 'male'
+                                        color: liveClient.gender.toLowerCase() == 'male'
                                             ? AppColors.primary
                                             : Colors.pink[400],
                                       ),
@@ -344,7 +378,7 @@ class ClientDetailsScreen extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             ),
-                            onPressed: () => _shareOnWhatsApp(context),
+                            onPressed: () => _shareOnWhatsApp(context, liveClient),
                           ),
                         ),
                         16.horizontalSpace,
@@ -363,7 +397,7 @@ class ClientDetailsScreen extends StatelessWidget {
                               Icons.phone_outlined,
                               color: AppColors.primary,
                             ),
-                            onPressed: () => _callClient(context),
+                            onPressed: () => _callClient(context, liveClient),
                           ),
                         ),
                       ],
@@ -387,7 +421,7 @@ class ClientDetailsScreen extends StatelessWidget {
                             onTap: () {
                               context.pushNamed(
                                 AppRoute.clientStyleGallery.name,
-                                extra: client,
+                                extra: liveClient,
                               );
                             },
                             child: CustomText(
@@ -416,7 +450,7 @@ class ClientDetailsScreen extends StatelessWidget {
                         onTap: () {
                           context.pushNamed(
                             AppRoute.clientStyleGallery.name,
-                            extra: client,
+                            extra: liveClient,
                           );
                         },
                         child: Padding(
@@ -598,7 +632,7 @@ class ClientDetailsScreen extends StatelessWidget {
                     12.verticalSpace,
 
                     // 5. Measurements Grid view
-                    client.measurements.isEmpty
+                    liveClient.measurements.isEmpty
                         ? Container(
                             width: double.infinity,
                             padding: EdgeInsets.symmetric(vertical: 24.h),
@@ -631,11 +665,11 @@ class ClientDetailsScreen extends StatelessWidget {
                               mainAxisSpacing: 12.h,
                               childAspectRatio: 2.2,
                             ),
-                            itemCount: client.measurements.length,
+                            itemCount: liveClient.measurements.length,
                             itemBuilder: (context, index) {
                               final key =
-                                  client.measurements.keys.elementAt(index);
-                              final value = client.measurements[key];
+                                  liveClient.measurements.keys.elementAt(index);
+                              final value = liveClient.measurements[key];
 
                               return Container(
                                 padding: EdgeInsets.all(12.r),
@@ -677,8 +711,8 @@ class ClientDetailsScreen extends StatelessWidget {
                     24.verticalSpace,
 
                     // 6. Tailoring Notes Preference Card
-                    if (client.notes != null &&
-                        client.notes!.trim().isNotEmpty) ...[
+                    if (liveClient.notes != null &&
+                        liveClient.notes!.trim().isNotEmpty) ...[
                       CustomText(
                         'Tailoring Notes',
                         style: GoogleFonts.plusJakartaSans(
@@ -711,7 +745,7 @@ class ClientDetailsScreen extends StatelessWidget {
                             12.horizontalSpace,
                             Expanded(
                               child: CustomText(
-                                client.notes!,
+                                liveClient.notes!,
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 14.spMin,
                                   color: AppColors.textSecondary,
@@ -739,7 +773,7 @@ class ClientDetailsScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: CustomText(
-                        'New Order creation for ${client.fullName} is coming soon in the next feature phase!',
+                        'New Order creation for ${liveClient.fullName} is coming soon in the next feature phase!',
                         style: GoogleFonts.plusJakartaSans(
                           color: Colors.white,
                           fontSize: 14.spMin,
