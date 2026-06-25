@@ -86,28 +86,13 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Header Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomText(
-                    'Clients Directory',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 28.spMin,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      ref.invalidate(clientsListProvider);
-                    },
-                    icon: Icon(
-                      Icons.refresh,
-                      color: AppColors.textBody,
-                      size: 24.r,
-                    ),
-                  ),
-                ],
+              CustomText(
+                'Clients Directory',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 28.spMin,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textSecondary,
+                ),
               ),
               4.verticalSpace,
               CustomText(
@@ -178,312 +163,336 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
 
               // 3. Dynamic content: Loading, Error, Empty, or List state
               Expanded(
-                child: clientsAsyncValue.when(
-                  data: (rawClients) {
-                    if (rawClients.isEmpty) {
-                      return Center(
-                        child: CustomEmptyState(
-                          title: 'No Clients Registered Yet',
-                          subtitle:
-                              'Create records and store body measurements easily.',
-                          imageWidget: Container(
-                            width: 150.r,
-                            height: 150.r,
-                            padding: EdgeInsets.all(20.r),
-                            decoration: BoxDecoration(
-                              color: AppColors.placeholder.withValues(alpha: 0.3),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Image.asset(
-                              AppIcons.measuringTape,
-                              width: 100.r,
-                              height: 100.r,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          buttonText: 'Add Client Record',
-                          onButtonPressed: () {
-                            context.pushNamed(AppRoute.addClient.name);
-                          },
-                        ),
-                      );
-                    }
-
-                    if (filteredClients.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                child: RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () async {
+                    ref.invalidate(clientsListProvider);
+                  },
+                  child: clientsAsyncValue.when(
+                    data: (rawClients) {
+                      if (rawClients.isEmpty) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           children: [
-                            Icon(
-                              Icons.search_off_outlined,
-                              size: 64.r,
-                              color: AppColors.textBody.withValues(alpha: 0.4),
-                            ),
-                            16.verticalSpace,
-                            CustomText(
-                              'No matching clients found',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 18.spMin,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            8.verticalSpace,
-                            CustomText(
-                              'Try checking spelling or phone digits.',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 14.spMin,
-                                color: AppColors.textBody,
+                            SizedBox(
+                              height: 400.h,
+                              child: Center(
+                                child: CustomEmptyState(
+                                  title: 'No Clients Registered Yet',
+                                  subtitle:
+                                      'Create records and store body measurements easily.',
+                                  imageWidget: Container(
+                                    width: 150.r,
+                                    height: 150.r,
+                                    padding: EdgeInsets.all(20.r),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.placeholder.withValues(alpha: 0.3),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Image.asset(
+                                      AppIcons.measuringTape,
+                                      width: 100.r,
+                                      height: 100.r,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                  buttonText: 'Add Client Record',
+                                  onButtonPressed: () {
+                                    context.pushNamed(AppRoute.addClient.name);
+                                  },
+                                ),
                               ),
                             ),
                           ],
-                        ),
-                      );
-                    }
+                        );
+                      }
 
-                    return ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: filteredClients.length,
-                      separatorBuilder: (context, index) => 12.verticalSpace,
-                      itemBuilder: (context, index) {
-                        final client = filteredClients[index];
-                        final initials = _getInitials(client.fullName);
-                        final avatarColor = _getAvatarColor(client.fullName);
-                        final avatarTextColor =
-                            _getAvatarTextColor(client.fullName);
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceWhite,
-                            borderRadius: BorderRadius.circular(16.r),
-                            border: Border.all(
-                              color: AppColors.placeholder.withValues(
-                                alpha: 0.8,
-                              ),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.02),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(16.r),
-                              onTap: () {
-                                context.pushNamed(
-                                  AppRoute.clientDetails.name,
-                                  extra: client,
-                                );
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 16.h,
-                                ),
-                                child: Row(
+                      if (filteredClients.isEmpty) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(
+                              height: 400.h,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    // Circular image/initials avatar
-                                    Container(
-                                      width: 48.r,
-                                      height: 48.r,
-                                      decoration: BoxDecoration(
-                                        color: avatarColor,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.05,
-                                          ),
-                                          width: 0.5.w,
-                                        ),
-                                      ),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: client.photoUrl != null
-                                          ? Image.network(
-                                              client.photoUrl!,
-                                              fit: BoxFit.cover,
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                return Center(
-                                                  child: CustomText(
-                                                    initials,
-                                                    style: GoogleFonts
-                                                        .plusJakartaSans(
-                                                      fontSize: 16.spMin,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: avatarTextColor,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              loadingBuilder: (context, child,
-                                                  loadingProgress) {
-                                                if (loadingProgress == null) {
-                                                  return child;
-                                                }
-                                                return const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    color: AppColors.primary,
-                                                  ),
-                                                );
-                                              },
-                                            )
-                                          : Center(
-                                              child: CustomText(
-                                                initials,
-                                                style: GoogleFonts
-                                                    .plusJakartaSans(
-                                                  fontSize: 16.spMin,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: avatarTextColor,
-                                                ),
-                                              ),
-                                            ),
-                                    ),
-                                    16.horizontalSpace,
-
-                                    // Client details
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          CustomText(
-                                            client.fullName,
-                                            style: GoogleFonts.playfairDisplay(
-                                              fontSize: 18.spMin,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.textSecondary,
-                                            ),
-                                          ),
-                                          4.verticalSpace,
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.phone_outlined,
-                                                size: 14.r,
-                                                color: AppColors.textBody,
-                                              ),
-                                              6.horizontalSpace,
-                                              CustomText(
-                                                client.phoneNumber ??
-                                                    'No phone number',
-                                                style:
-                                                    GoogleFonts.plusJakartaSans(
-                                                  fontSize: 13.spMin,
-                                                  color: AppColors.textBody,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    // Gender Badge
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                        vertical: 6.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: client.gender.toLowerCase() ==
-                                                'male'
-                                            ? AppColors.primary.withValues(
-                                                alpha: 0.08,
-                                              )
-                                            : Colors.pink.withValues(
-                                                alpha: 0.08,
-                                              ),
-                                        borderRadius:
-                                            BorderRadius.circular(20.r),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            client.gender.toLowerCase() ==
-                                                    'male'
-                                                ? Icons.male
-                                                : Icons.female,
-                                            size: 14.r,
-                                            color: client.gender.toLowerCase() ==
-                                                    'male'
-                                                ? AppColors.primary
-                                                : Colors.pink[400],
-                                          ),
-                                          4.horizontalSpace,
-                                          CustomText(
-                                            client.gender[0].toUpperCase() +
-                                                client.gender.substring(1),
-                                            style: GoogleFonts.plusJakartaSans(
-                                              fontSize: 12.spMin,
-                                              fontWeight: FontWeight.bold,
-                                              color: client.gender.toLowerCase() ==
-                                                      'male'
-                                                  ? AppColors.primary
-                                                  : Colors.pink[400],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    8.horizontalSpace,
                                     Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 14.r,
-                                      color: AppColors.textBody
-                                          .withValues(alpha: 0.5),
+                                      Icons.search_off_outlined,
+                                      size: 64.r,
+                                      color: AppColors.textBody.withValues(alpha: 0.4),
+                                    ),
+                                    16.verticalSpace,
+                                    CustomText(
+                                      'No matching clients found',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 18.spMin,
+                                        color: AppColors.textSecondary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    8.verticalSpace,
+                                    CustomText(
+                                      'Try checking spelling or phone digits.',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 14.spMin,
+                                        color: AppColors.textBody,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         );
-                      },
-                    );
-                  },
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary,
+                      }
+
+                      return ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        itemCount: filteredClients.length,
+                        separatorBuilder: (context, index) => 12.verticalSpace,
+                        itemBuilder: (context, index) {
+                          final client = filteredClients[index];
+                          final initials = _getInitials(client.fullName);
+                          final avatarColor = _getAvatarColor(client.fullName);
+                          final avatarTextColor =
+                              _getAvatarTextColor(client.fullName);
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceWhite,
+                              borderRadius: BorderRadius.circular(16.r),
+                              border: Border.all(
+                                color: AppColors.placeholder.withValues(
+                                  alpha: 0.8,
+                                ),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.02),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16.r),
+                                onTap: () {
+                                  context.pushNamed(
+                                    AppRoute.clientDetails.name,
+                                    extra: client,
+                                  );
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 16.h,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Circular image/initials avatar
+                                      Container(
+                                        width: 48.r,
+                                        height: 48.r,
+                                        decoration: BoxDecoration(
+                                          color: avatarColor,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.05,
+                                            ),
+                                            width: 0.5.w,
+                                          ),
+                                        ),
+                                        clipBehavior: Clip.antiAlias,
+                                        child: client.photoUrl != null
+                                            ? Image.network(
+                                                client.photoUrl!,
+                                                fit: BoxFit.cover,
+                                                errorBuilder:
+                                                    (context, error, stackTrace) {
+                                                  return Center(
+                                                    child: CustomText(
+                                                      initials,
+                                                      style: GoogleFonts
+                                                          .plusJakartaSans(
+                                                        fontSize: 16.spMin,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: avatarTextColor,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                loadingBuilder: (context, child,
+                                                    loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  }
+                                                  return const Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: AppColors.primary,
+                                                    ),
+                                                  );
+                                                },
+                                              )
+                                            : Center(
+                                                child: CustomText(
+                                                  initials,
+                                                  style: GoogleFonts
+                                                      .plusJakartaSans(
+                                                    fontSize: 16.spMin,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: avatarTextColor,
+                                                  ),
+                                                ),
+                                              ),
+                                      ),
+                                      16.horizontalSpace,
+
+                                      // Client details
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            CustomText(
+                                              client.fullName,
+                                              style: GoogleFonts.playfairDisplay(
+                                                fontSize: 18.spMin,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textSecondary,
+                                              ),
+                                            ),
+                                            4.verticalSpace,
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.phone_outlined,
+                                                  size: 14.r,
+                                                  color: AppColors.textBody,
+                                                ),
+                                                6.horizontalSpace,
+                                                CustomText(
+                                                  client.phoneNumber ??
+                                                      'No phone number',
+                                                  style:
+                                                      GoogleFonts.plusJakartaSans(
+                                                    fontSize: 13.spMin,
+                                                    color: AppColors.textBody,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      // Gender Badge
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w,
+                                          vertical: 6.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: client.gender.toLowerCase() ==
+                                                  'male'
+                                              ? AppColors.primary.withValues(
+                                                  alpha: 0.08,
+                                                )
+                                              : Colors.pink.withValues(
+                                                  alpha: 0.08,
+                                                ),
+                                          borderRadius:
+                                              BorderRadius.circular(20.r),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              client.gender.toLowerCase() ==
+                                                      'male'
+                                                  ? Icons.male
+                                                  : Icons.female,
+                                              size: 14.r,
+                                              color: client.gender.toLowerCase() ==
+                                                      'male'
+                                                  ? AppColors.primary
+                                                  : Colors.pink[400],
+                                            ),
+                                            4.horizontalSpace,
+                                            CustomText(
+                                              client.gender[0].toUpperCase() +
+                                                  client.gender.substring(1),
+                                              style: GoogleFonts.plusJakartaSans(
+                                                fontSize: 12.spMin,
+                                                fontWeight: FontWeight.bold,
+                                                color: client.gender.toLowerCase() ==
+                                                        'male'
+                                                    ? AppColors.primary
+                                                    : Colors.pink[400],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      8.horizontalSpace,
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 14.r,
+                                        color: AppColors.textBody
+                                            .withValues(alpha: 0.5),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
                     ),
-                  ),
-                  error: (err, stack) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 48.r,
-                          color: AppColors.notification,
-                        ),
-                        16.verticalSpace,
-                        CustomText(
-                          'Error loading clients',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 16.spMin,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textSecondary,
+                    error: (err, stack) => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 48.r,
+                            color: AppColors.notification,
                           ),
-                        ),
-                        8.verticalSpace,
-                        CustomText(
-                          err.toString(),
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12.spMin,
-                            color: AppColors.textBody,
+                          16.verticalSpace,
+                          CustomText(
+                            'Error loading clients',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 16.spMin,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                          8.verticalSpace,
+                          CustomText(
+                            err.toString(),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12.spMin,
+                              color: AppColors.textBody,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
