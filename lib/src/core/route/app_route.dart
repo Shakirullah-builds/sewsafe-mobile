@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/auth/auth.dart';
@@ -28,16 +30,17 @@ enum AppRoute {
 
 // 2. The Router Provider
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateChangesProvider);
+  final authRepository = ref.watch(authRepositoryProvider);
+  final refreshListenable = GoRouterRefreshStream(authRepository.authStateChanges);
 
   return GoRouter(
     initialLocation: '/signup', // We start inside-out, focusing on Auth first
     debugLogDiagnostics: true, // Prints route changes in your terminal!
+    refreshListenable: refreshListenable,
     // 3. The Active Gatekeeper
     redirect: (context, state) {
-      if (authState.isLoading || !authState.hasValue) return null;
-
-      final isLoggedIn = authState.value != null;
+      final user = authRepository.currentUser;
+      final isLoggedIn = user != null;
       final isGoingToAuth = state.matchedLocation == '/login' || 
                             state.matchedLocation == '/signup' || 
                             state.matchedLocation == '/verify-email' ||
@@ -115,3 +118,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// A GoRouter compatible refresh listenable that wraps a Stream.
+class GoRouterRefreshStream extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _subscription;
+
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+          (dynamic _) => notifyListeners(),
+        );
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
