@@ -82,7 +82,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/add-client',
         name: AppRoute.addClient.name,
         builder: (context, state) {
-          final client = state.extra as Client?;
+          final extra = state.extra;
+          final client = extra is Client
+              ? extra
+              : (extra is Map<String, dynamic>
+                  ? Client.fromJson(extra)
+                  : null);
           return NewClientRecordScreen(client: client);
         },
       ),
@@ -90,7 +95,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/client-details',
         name: AppRoute.clientDetails.name,
         builder: (context, state) {
-          final client = state.extra as Client;
+          final extra = state.extra;
+          final client = extra is Client
+              ? extra
+              : Client.fromJson(Map<String, dynamic>.from(extra as Map));
           return ClientDetailsScreen(client: client);
         },
       ),
@@ -98,7 +106,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/client-style-gallery',
         name: AppRoute.clientStyleGallery.name,
         builder: (context, state) {
-          final client = state.extra as Client;
+          final extra = state.extra;
+          final client = extra is Client
+              ? extra
+              : Client.fromJson(Map<String, dynamic>.from(extra as Map));
           return ClientStyleGalleryScreen(client: client);
         },
       ),
