@@ -43,6 +43,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  /// Generates a premium pastel background color based on name hash
+  Color _getAvatarColor(String name) {
+    final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
+    final double hue = (hash * 137.5) % 360; // Golden ratio hue distribution
+    return HSLColor.fromAHSL(1.0, hue, 0.45, 0.90).toColor();
+  }
+
+  /// Generates a dark contrasting text color based on name hash
+  Color _getAvatarTextColor(String name) {
+    final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
+    final double hue = (hash * 137.5) % 360;
+    return HSLColor.fromAHSL(1.0, hue, 0.70, 0.35).toColor();
+  }
+
+  /// Extracts up to two initials from the client's full name
+  String _getInitials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || name.trim().isEmpty) return '?';
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
   /// Generates mock order information dynamically based on saved client records
   List<Map<String, dynamic>> _generateMockOrders(List<Client> clients) {
     final List<Map<String, dynamic>> mockOrders = [];
@@ -507,25 +529,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   width: 56.r,
                   height: 56.r,
                   decoration: BoxDecoration(
-                    color: AppColors.placeholder.withValues(alpha: 0.2),
+                    color: _getAvatarColor(client.fullName),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: client.photoUrl != null
-                      ? Image.network(
-                          client.photoUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            isDraft ? Icons.edit_note : Icons.cut_outlined,
-                            color: AppColors.primary,
-                            size: 24.r,
-                          ),
-                        )
-                      : Icon(
-                          isDraft ? Icons.edit_note : Icons.cut_outlined,
-                          color: AppColors.primary,
-                          size: 24.r,
-                        ),
+                  child: Center(
+                    child: CustomText(
+                      _getInitials(client.fullName),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16.spMin,
+                        fontWeight: FontWeight.bold,
+                        color: _getAvatarTextColor(client.fullName),
+                      ),
+                    ),
+                  ),
                 ),
                 16.horizontalSpace,
 

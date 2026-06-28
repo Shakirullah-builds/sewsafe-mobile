@@ -308,51 +308,16 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                                             width: 0.5.w,
                                           ),
                                         ),
-                                        clipBehavior: Clip.antiAlias,
-                                        child: client.photoUrl != null
-                                            ? Image.network(
-                                                client.photoUrl!,
-                                                fit: BoxFit.cover,
-                                                errorBuilder:
-                                                    (context, error, stackTrace) {
-                                                  return Center(
-                                                    child: CustomText(
-                                                      initials,
-                                                      style: GoogleFonts
-                                                          .plusJakartaSans(
-                                                        fontSize: 16.spMin,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: avatarTextColor,
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                                loadingBuilder: (context, child,
-                                                    loadingProgress) {
-                                                  if (loadingProgress == null) {
-                                                    return child;
-                                                  }
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      color: AppColors.primary,
-                                                    ),
-                                                  );
-                                                },
-                                              )
-                                            : Center(
-                                                child: CustomText(
-                                                  initials,
-                                                  style: GoogleFonts
-                                                      .plusJakartaSans(
-                                                    fontSize: 16.spMin,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: avatarTextColor,
-                                                  ),
-                                                ),
-                                              ),
+                                        child: Center(
+                                          child: CustomText(
+                                            initials,
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontSize: 16.spMin,
+                                              fontWeight: FontWeight.bold,
+                                              color: avatarTextColor,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                       16.horizontalSpace,
 
