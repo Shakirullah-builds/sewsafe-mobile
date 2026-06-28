@@ -205,14 +205,17 @@ class _ClientStyleGalleryScreenState extends ConsumerState<ClientStyleGalleryScr
       // Remove photo item
       updatedStylePhotos.removeWhere((item) => item['url'] == photoItem['url']);
 
-      // Save to database, keeping photoUrl preserved to avoid profile photo overrides
+      // If the deleted photo matches the legacy primary photoUrl, clear it
+      final newPhotoUrl = client.photoUrl == photoItem['url'] ? null : client.photoUrl;
+
+      // Save to database, keeping photoUrl updated to reflect deletion
       final success = await ref.read(clientControllerProvider.notifier).editClient(
         clientId: client.id!,
         fullName: client.fullName,
         phoneNumber: client.phoneNumber ?? '',
         gender: client.gender,
         measurements: client.measurements,
-        photoUrl: client.photoUrl, // Keep profile picture unchanged
+        photoUrl: newPhotoUrl,
         notes: client.notes,
         stylePhotos: updatedStylePhotos.isEmpty ? null : updatedStylePhotos,
       );
