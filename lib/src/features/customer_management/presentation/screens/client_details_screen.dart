@@ -152,6 +152,9 @@ class ClientDetailsScreen extends ConsumerWidget {
     final formattedDate = updateTime != null
         ? DateFormat('MMM dd, yyyy').format(updateTime)
         : 'Unknown Date';
+    final registrationDate = liveClient.createdAt != null
+        ? DateFormat('MMM dd, yyyy').format(liveClient.createdAt!)
+        : 'Unknown Date';
 
     final List<Map<String, String>> allPhotos = [];
     if (liveClient.stylePhotos != null) {
@@ -270,6 +273,25 @@ class ClientDetailsScreen extends ConsumerWidget {
                                   6.horizontalSpace,
                                   CustomText(
                                     liveClient.phoneNumber ?? 'No phone number',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 14.spMin,
+                                      color: AppColors.textBody,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              6.verticalSpace,
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today_outlined,
+                                    size: 16.r,
+                                    color: AppColors.textBody,
+                                  ),
+                                  6.horizontalSpace,
+                                  CustomText(
+                                    'Customer since: $registrationDate',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 14.spMin,
                                       color: AppColors.textBody,
