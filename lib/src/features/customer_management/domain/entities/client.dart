@@ -9,6 +9,7 @@ class Client {
   final String? notes;
   final List<Map<String, String>>? stylePhotos;
   final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Client({
     this.id,
@@ -21,6 +22,7 @@ class Client {
     this.notes,
     this.stylePhotos,
     this.createdAt,
+    this.updatedAt,
   });
 
   /// Factory constructor to parse client record from Supabase JSON response
@@ -30,6 +32,8 @@ class Client {
     // Extract photo URL, notes and style photos history from measurements metadata
     final photoUrl = rawMeasurements['_photo_url'] as String?;
     final notes = rawMeasurements['_notes'] as String?;
+    final updatedAtStr = rawMeasurements['_updated_at'] as String?;
+    final updatedAt = updatedAtStr != null ? DateTime.parse(updatedAtStr) : null;
     
     final rawStylePhotos = rawMeasurements['_style_photos'] as List<dynamic>?;
     final List<Map<String, String>> stylePhotosList = [];
@@ -47,7 +51,7 @@ class Client {
     // Filter out metadata keys to keep measurements strictly numeric
     final measurementsMap = <String, double>{};
     rawMeasurements.forEach((key, value) {
-      if (key != '_photo_url' && key != '_notes' && key != '_style_photos' && value is num) {
+      if (key != '_photo_url' && key != '_notes' && key != '_style_photos' && key != '_updated_at' && value is num) {
         measurementsMap[key] = value.toDouble();
       }
     });
@@ -65,6 +69,7 @@ class Client {
       createdAt: json['createdAt'] != null 
           ? DateTime.parse(json['createdAt'] as String)
           : null,
+      updatedAt: updatedAt,
     );
   }
 
@@ -81,6 +86,7 @@ class Client {
         if (photoUrl != null) '_photo_url': photoUrl,
         if (notes != null) '_notes': notes,
         if (stylePhotos != null) '_style_photos': stylePhotos,
+        if (updatedAt != null) '_updated_at': updatedAt!.toIso8601String(),
       },
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };
@@ -98,6 +104,7 @@ class Client {
     String? notes,
     List<Map<String, String>>? stylePhotos,
     DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return Client(
       id: id ?? this.id,
@@ -110,6 +117,7 @@ class Client {
       notes: notes ?? this.notes,
       stylePhotos: stylePhotos ?? this.stylePhotos,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

@@ -27,6 +27,7 @@ class ClientRepository {
         if (client.photoUrl != null) '_photo_url': client.photoUrl,
         if (client.notes != null) '_notes': client.notes,
         if (client.stylePhotos != null) '_style_photos': client.stylePhotos,
+        '_updated_at': DateTime.now().toIso8601String(),
       },
     });
   }
@@ -91,6 +92,7 @@ class ClientRepository {
           if (client.photoUrl != null) '_photo_url': client.photoUrl,
           if (client.notes != null) '_notes': client.notes,
           if (client.stylePhotos != null) '_style_photos': client.stylePhotos,
+          '_updated_at': DateTime.now().toIso8601String(),
         },
       }).eq('id', latestId);
     } else {
@@ -102,6 +104,7 @@ class ClientRepository {
           if (client.photoUrl != null) '_photo_url': client.photoUrl,
           if (client.notes != null) '_notes': client.notes,
           if (client.stylePhotos != null) '_style_photos': client.stylePhotos,
+          '_updated_at': DateTime.now().toIso8601String(),
         },
       });
     }
