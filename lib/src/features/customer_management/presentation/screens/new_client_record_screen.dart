@@ -116,26 +116,18 @@ class _NewClientRecordScreenState extends ConsumerState<NewClientRecordScreen> {
 
   final List<String> _maleKeys = [
     'Neck',
-    'Shoulder',
     'Chest',
-    'Sleeve',
-    'Waist',
-    'Hips',
-    'Inseam',
-    'Shirt Length',
+    'Shoulder',
     'Trouser Length',
+    'Sleeve',
   ];
 
   final List<String> _femaleKeys = [
-    'Neck',
     'Bust',
-    'Underbust',
-    'Shoulder',
-    'Sleeve',
     'Waist',
     'Hips',
+    'Gown Length',
     'Blouse Length',
-    'Skirt/Trouser Length',
   ];
 
   @override
