@@ -96,4 +96,18 @@ class ClientController extends _$ClientController {
 
     return !state.hasError;
   }
+
+  /// Deletes a client and invalidates clients list provider.
+  /// Returns [true] if successful, [false] otherwise.
+  Future<bool> deleteClient(String clientId) async {
+    state = const AsyncValue.loading();
+    
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(clientRepositoryProvider);
+      await repository.deleteClient(clientId);
+      ref.invalidate(clientsListProvider);
+    });
+
+    return !state.hasError;
+  }
 }
