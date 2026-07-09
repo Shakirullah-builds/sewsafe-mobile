@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -73,7 +74,9 @@ class ClientRepository {
       'fullName': client.fullName,
       'phoneNumber': client.phoneNumber,
       'gender': client.gender,
-    }).eq('id', client.id!);
+    }).eq('id', client.id!).select();
+
+    debugPrint('Client updated: $client'); // if this is empty [], RLS blocked it
 
     // 2. Fetch the latest measurement row for this client to get its ID
     final measurementsResponse = await _supabase
