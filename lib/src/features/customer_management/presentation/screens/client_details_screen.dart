@@ -148,12 +148,12 @@ class ClientDetailsScreen extends ConsumerWidget {
     final initials = _getInitials(liveClient.fullName);
     final avatarColor = _getAvatarColor(liveClient.fullName);
     final avatarTextColor = _getAvatarTextColor(liveClient.fullName);
-    final updateTime = liveClient.updatedAt ?? liveClient.createdAt;
+    final updateTime = (liveClient.updatedAt ?? liveClient.createdAt)?.toLocal();
     final formattedDate = updateTime != null
         ? DateFormat('MMM dd, yyyy').format(updateTime)
         : 'Unknown Date';
     final registrationDate = liveClient.createdAt != null
-        ? DateFormat('MMM dd, yyyy').format(liveClient.createdAt!)
+        ? DateFormat('MMM dd, yyyy').format(liveClient.createdAt!.toLocal())
         : 'Unknown Date';
 
     final List<Map<String, String>> allPhotos = [];
