@@ -353,7 +353,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     // Visual placeholder Edit Profile button using UI Kit CustomButton
                     CustomButton.outlined(
                       text: 'Edit Profile',
-                      width: 96.w,
+                      width: 130.w,
                       height: 36.h,
                       borderRadius: 20.r,
                       buttonTextFontSize: 12.spMin,
