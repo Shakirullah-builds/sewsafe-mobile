@@ -186,7 +186,7 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 28.spMin,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textSecondary,
+                  color: AppColors.primary,
                 ),
               ),
               4.verticalSpace,

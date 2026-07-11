@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_icons.dart';
+import 'package:sewsafe_mobile/src/core/widgets/custom_button.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_svg.dart';
 import 'package:sewsafe_mobile/src/core/widgets/custom_text.dart';
 import 'package:sewsafe_mobile/src/features/auth/backend/data/auth_repository.dart';
@@ -26,7 +27,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void _triggerBackupNow() async {
     if (_isBackingUp) return;
-    
+
     setState(() {
       _isBackingUp = true;
     });
@@ -56,17 +57,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
-        title: const Text('Select Measurement Unit'),
+        title: CustomText(
+          'Select Measurement Unit',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 16.spMin,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
         actions: <CupertinoActionSheetAction>[
           CupertinoActionSheetAction(
-            child: const Text('Inches (in)'),
+            child: CustomText(
+              'Inches (in)',
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 16.spMin,
+              ),
+            ),
             onPressed: () {
               setState(() => _selectedUnit = "Inches (in)");
               Navigator.pop(context);
             },
           ),
           CupertinoActionSheetAction(
-            child: const Text('Centimeters (cm)'),
+            child: CustomText(
+              'Centimeters (cm)',
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 16.spMin,
+              ),
+            ),
             onPressed: () {
               setState(() => _selectedUnit = "Centimeters (cm)");
               Navigator.pop(context);
@@ -76,7 +99,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: CustomText(
+            'Cancel',
+            style: GoogleFonts.plusJakartaSans(
+              color: Colors.red[600],
+              fontWeight: FontWeight.bold,
+              fontSize: 16.spMin,
+            ),
+          ),
         ),
       ),
     );
@@ -86,24 +116,53 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
-        title: const Text('Select Default Gender'),
+        title: CustomText(
+          'Select Default Gender',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 16.spMin,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
         actions: <CupertinoActionSheetAction>[
           CupertinoActionSheetAction(
-            child: const Text('Unisex'),
+            child: CustomText(
+              'Unisex',
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 16.spMin,
+              ),
+            ),
             onPressed: () {
               setState(() => _selectedGender = "Unisex");
               Navigator.pop(context);
             },
           ),
           CupertinoActionSheetAction(
-            child: const Text('Male'),
+            child: CustomText(
+              'Male',
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 16.spMin,
+              ),
+            ),
             onPressed: () {
               setState(() => _selectedGender = "Male");
               Navigator.pop(context);
             },
           ),
           CupertinoActionSheetAction(
-            child: const Text('Female'),
+            child: CustomText(
+              'Female',
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 16.spMin,
+              ),
+            ),
             onPressed: () {
               setState(() => _selectedGender = "Female");
               Navigator.pop(context);
@@ -113,7 +172,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: CustomText(
+            'Cancel',
+            style: GoogleFonts.plusJakartaSans(
+              color: Colors.red[600],
+              fontWeight: FontWeight.bold,
+              fontSize: 16.spMin,
+            ),
+          ),
         ),
       ),
     );
@@ -126,17 +192,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         return CupertinoAlertDialog(
           title: Text(
             'Sign Out',
-            style: GoogleFonts.plusJakartaSans(
-              fontWeight: FontWeight.bold,
-            ),
+            style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold),
           ),
           content: Padding(
             padding: EdgeInsets.only(top: 8.h),
             child: Text(
               'Are you sure you want to sign out of your account?',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 13.spMin,
-              ),
+              style: GoogleFonts.plusJakartaSans(fontSize: 13.spMin),
             ),
           ),
           actions: <Widget>[
@@ -161,14 +223,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               onPressed: () async {
                 Navigator.of(context).pop(); // pop confirm dialog
-                
+
                 // Show loading spinner
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (context) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  builder: (context) =>
+                      const Center(child: CircularProgressIndicator()),
                 );
 
                 await ref.read(authControllerProvider.notifier).logout();
@@ -216,7 +277,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: CustomText('No new notifications', color: Colors.white),
+                          content: CustomText(
+                            'No new notifications',
+                            color: Colors.white,
+                          ),
                         ),
                       );
                     },
@@ -286,30 +350,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ],
                       ),
                     ),
-                    // Visual placeholder Edit Profile button
-                    OutlinedButton(
+                    // Visual placeholder Edit Profile button using UI Kit CustomButton
+                    CustomButton.outlined(
+                      text: 'Edit Profile',
+                      width: 96.w,
+                      height: 36.h,
+                      borderRadius: 20.r,
+                      buttonTextFontSize: 12.spMin,
+                      fontWeight: FontWeight.bold,
+                      backgroundColor: AppColors.primary,
+                      textColor: AppColors.primary,
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: CustomText('Edit Profile coming soon!', color: Colors.white),
+                            content: CustomText(
+                              'Edit Profile coming soon!',
+                              color: Colors.white,
+                            ),
                           ),
                         );
                       },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                      ),
-                      child: CustomText(
-                        'Edit Profile',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12.spMin,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -317,16 +377,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               24.verticalSpace,
 
               // 3. Data & Backup Section
-              _buildSectionHeader('DATA & BACKUP'),
-              8.verticalSpace,
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceWhite,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: AppColors.placeholder.withValues(alpha: 0.8),
-                  ),
-                ),
+              _SettingsSection(
+                title: 'DATA & BACKUP',
                 child: Column(
                   children: [
                     Padding(
@@ -374,47 +426,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: SizedBox(
-                        width: double.infinity,
+                      child: CustomButton(
+                        text: 'Backup Now',
+                        icon: Icons.backup_outlined,
+                        isLoading: _isBackingUp,
+                        backgroundColor: AppColors.primary,
                         height: 48.h,
-                        child: ElevatedButton.icon(
-                          onPressed: _isBackingUp ? null : _triggerBackupNow,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            elevation: 0,
-                          ),
-                          icon: _isBackingUp
-                              ? SizedBox(
-                                  width: 18.r,
-                                  height: 18.r,
-                                  child: const CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.backup_outlined,
-                                  color: Colors.white,
-                                  size: 18.r,
-                                ),
-                          label: CustomText(
-                            _isBackingUp ? 'Syncing...' : 'Backup Now',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: Colors.white,
-                              fontSize: 14.spMin,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                        borderRadius: 12.r,
+                        onPressed: _triggerBackupNow,
                       ),
                     ),
                     12.verticalSpace,
                     const Divider(height: 1, color: AppColors.placeholder),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 12.h,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -452,26 +480,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               24.verticalSpace,
 
               // 4. Customization Section
-              _buildSectionHeader('CUSTOMIZATION'),
-              8.verticalSpace,
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceWhite,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: AppColors.placeholder.withValues(alpha: 0.8),
-                  ),
-                ),
+              _SettingsSection(
+                title: 'CUSTOMIZATION',
                 child: Column(
                   children: [
-                    _buildSettingsRow(
+                    _SettingsTile(
                       icon: Icons.straighten_outlined,
                       title: 'Measurement Units',
                       value: _selectedUnit,
                       onTap: _showUnitSelector,
                     ),
                     const Divider(height: 1, color: AppColors.placeholder),
-                    _buildSettingsRow(
+                    _SettingsTile(
                       icon: Icons.person_outline,
                       title: 'Default Gender',
                       value: _selectedGender,
@@ -483,38 +503,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               24.verticalSpace,
 
               // 5. Support Section
-              _buildSectionHeader('SUPPORT'),
-              8.verticalSpace,
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceWhite,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: AppColors.placeholder.withValues(alpha: 0.8),
-                  ),
-                ),
+              _SettingsSection(
+                title: 'SUPPORT',
                 child: Column(
                   children: [
-                    _buildSettingsRow(
+                    _SettingsTile(
                       icon: Icons.help_outline,
                       title: 'Help Center',
                       trailingIcon: Icons.open_in_new,
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: CustomText('Launching Help Center...', color: Colors.white),
+                            content: CustomText(
+                              'Launching Help Center...',
+                              color: Colors.white,
+                            ),
                           ),
                         );
                       },
                     ),
                     const Divider(height: 1, color: AppColors.placeholder),
-                    _buildSettingsRow(
+                    _SettingsTile(
                       icon: Icons.mail_outline,
                       title: 'Contact Us',
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: CustomText('Opening contact form...', color: Colors.white),
+                            content: CustomText(
+                              'Opening contact form...',
+                              color: Colors.white,
+                            ),
                           ),
                         );
                       },
@@ -525,51 +543,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               24.verticalSpace,
 
               // 6. Destructive Sign Out Card
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceWhite,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: Colors.red[100]!,
-                  ),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: _confirmSignOut,
-                    borderRadius: BorderRadius.circular(16.r),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.logout_outlined,
-                                color: Colors.red[600],
-                                size: 20.r,
-                              ),
-                              12.horizontalSpace,
-                              CustomText(
-                                'Sign Out',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 14.spMin,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: Colors.red[300],
-                            size: 20.r,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+              _SettingsSection(
+                title: 'ACCOUNT ACTIONS',
+                child: _SettingsTile(
+                  icon: Icons.logout_outlined,
+                  title: 'Sign Out',
+                  color: Colors.red[600],
+                  onTap: _confirmSignOut,
                 ),
               ),
               36.verticalSpace,
@@ -629,42 +609,81 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
+}
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: EdgeInsets.only(left: 4.w),
-      child: CustomText(
-        title,
-        style: GoogleFonts.plusJakartaSans(
-          fontSize: 12.spMin,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textBody.withValues(alpha: 0.8),
-          letterSpacing: 1.0,
+/// Private reusable Section Card wrapper to maintain architectural consistency
+class _SettingsSection extends StatelessWidget {
+  final String title;
+  final Widget child;
+
+  const _SettingsSection({required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 4.w),
+          child: CustomText(
+            title,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12.spMin,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textBody.withValues(alpha: 0.8),
+              letterSpacing: 1.0,
+            ),
+          ),
         ),
-      ),
+        8.verticalSpace,
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceWhite,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: AppColors.placeholder.withValues(alpha: 0.8),
+            ),
+          ),
+          child: child,
+        ),
+      ],
     );
   }
+}
 
-  Widget _buildSettingsRow({
-    required IconData icon,
-    required String title,
-    String? value,
-    IconData trailingIcon = Icons.chevron_right,
-    required VoidCallback onTap,
-  }) {
+/// Private reusable Settings Row item mapping to visual frames
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? value;
+  final IconData trailingIcon;
+  final Color? color;
+  final VoidCallback onTap;
+
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    this.value,
+    this.trailingIcon = Icons.chevron_right,
+    this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = color ?? AppColors.textSecondary;
+    final iconColor = color ?? AppColors.textBody;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(16.r),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: AppColors.textBody,
-                size: 20.r,
-              ),
+              Icon(icon, color: iconColor, size: 20.r),
               12.horizontalSpace,
               Expanded(
                 child: CustomText(
@@ -672,13 +691,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14.spMin,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: titleColor,
                   ),
                 ),
               ),
               if (value != null) ...[
                 CustomText(
-                  value,
+                  value!,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13.spMin,
                     color: AppColors.textBody,
@@ -689,7 +708,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
               Icon(
                 trailingIcon,
-                color: AppColors.textBody.withValues(alpha: 0.4),
+                color:
+                    color?.withValues(alpha: 0.5) ??
+                    AppColors.textBody.withValues(alpha: 0.4),
                 size: 20.r,
               ),
             ],
