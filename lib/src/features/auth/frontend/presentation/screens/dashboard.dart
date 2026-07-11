@@ -6,6 +6,7 @@ import 'package:sewsafe_mobile/src/core/constants/app_colors.dart';
 import 'package:sewsafe_mobile/src/core/route/app_route.dart';
 import 'package:sewsafe_mobile/src/features/auth/frontend/presentation/screens/home.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/presentation/screens/clients_screen.dart';
+import 'package:sewsafe_mobile/src/features/customer_management/presentation/screens/settings_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -21,7 +22,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     const HomeScreen(),
     const ClientsScreen(),
     const PlaceholderScreen(title: 'Orders', icon: Icons.inventory_2_outlined),
-    const PlaceholderScreen(title: 'Settings', icon: Icons.settings_outlined),
+    const SettingsScreen(),
   ];
 
   @override
