@@ -332,6 +332,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         children: [
                           CustomText(
                             displayName,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 16.spMin,
                               fontWeight: FontWeight.bold,
@@ -350,6 +352,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ],
                       ),
                     ),
+                    12.horizontalSpace,
                     // Visual placeholder Edit Profile button using UI Kit CustomButton
                     CustomButton.outlined(
                       text: 'Edit Profile',
