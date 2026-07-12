@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -69,11 +71,14 @@ class ClientRepository {
   /// Updates an existing client record and their latest measurements
   Future<void> updateClient(Client client) async {
     // 1. Update basic metadata in 'clients' table
-    await _supabase.from('clients').update({
+    final clientResult = await _supabase.from('clients').update({
       'fullName': client.fullName,
       'phoneNumber': client.phoneNumber,
       'gender': client.gender,
-    }).eq('id', client.id!);
+    }).eq('id', client.id!).select();
+
+    debugPrint('Supabase clients update affected rows count: ${clientResult.length}');
+    debugPrint('Supabase clients update result payload: $clientResult');
 
     // 2. Fetch the latest measurement row for this client to get its ID
     final measurementsResponse = await _supabase
@@ -86,7 +91,7 @@ class ClientRepository {
     if (measurementsResponse.isNotEmpty) {
       final latestId = measurementsResponse.first['id'];
       // Update that specific measurement row
-      await _supabase.from('measurements').update({
+      final measurementResult = await _supabase.from('measurements').update({
         'measurementData': {
           ...client.measurements,
           if (client.photoUrl != null) '_photo_url': client.photoUrl,
@@ -94,10 +99,11 @@ class ClientRepository {
           if (client.stylePhotos != null) '_style_photos': client.stylePhotos,
           '_updated_at': DateTime.now().toIso8601String(),
         },
-      }).eq('id', latestId);
+      }).eq('id', latestId).select();
+      debugPrint('Supabase measurements update result payload: $measurementResult');
     } else {
       // Fallback: If no measurement row exists, insert one
-      await _supabase.from('measurements').insert({
+      final fallbackResult = await _supabase.from('measurements').insert({
         'clientsId': client.id!,
         'measurementData': {
           ...client.measurements,
@@ -106,8 +112,18 @@ class ClientRepository {
           if (client.stylePhotos != null) '_style_photos': client.stylePhotos,
           '_updated_at': DateTime.now().toIso8601String(),
         },
-      });
+      }).select();
+      debugPrint('Supabase measurements fallback insert result payload: $fallbackResult');
     }
+  }
+
+  /// Deletes a client record and their associated measurements
+  Future<void> deleteClient(String clientId) async {
+    // 1. Delete associated measurements first to clean up relations
+    await _supabase.from('measurements').delete().eq('clientsId', clientId);
+
+    // 2. Delete the main client record
+    await _supabase.from('clients').delete().eq('id', clientId);
   }
 }
 

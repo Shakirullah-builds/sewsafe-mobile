@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,7 @@ import 'package:sewsafe_mobile/src/core/widgets/custom_textform_field.dart';
 import 'package:sewsafe_mobile/src/core/constants/app_icons.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/domain/entities/client.dart';
 import 'package:sewsafe_mobile/src/features/customer_management/presentation/controller/client_controller.dart';
+import 'package:sewsafe_mobile/src/features/customer_management/presentation/widgets/slidable_client_tile.dart';
 
 /// Riverpod StateProvider to track the search query in real-time
 final clientsSearchQueryProvider = StateProvider<String>((ref) => '');
@@ -72,6 +74,99 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
 
+  /// Displays iOS-styled dialog to confirm client deletion
+  void _confirmDeleteClient(
+    BuildContext context,
+    WidgetRef ref,
+    Client client,
+  ) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(
+            'Delete Client',
+            style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold),
+          ),
+          content: Padding(
+            padding: EdgeInsets.only(top: 8.h),
+            child: Text(
+              'Are you sure you want to delete ${client.fullName}? All their records, measurements, and style history will be permanently deleted.',
+              style: GoogleFonts.plusJakartaSans(fontSize: 14.spMin),
+            ),
+          ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              child: Text(
+                'Delete',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () async {
+                Navigator.of(
+                  context,
+                ).pop(); // pop Cupertino confirmation dialog
+
+                // Show loading spinner dialog overlay
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) =>
+                      const Center(child: CircularProgressIndicator()),
+                );
+
+                final success = await ref
+                    .read(clientControllerProvider.notifier)
+                    .deleteClient(client.id!);
+
+                if (context.mounted) {
+                  Navigator.of(context).pop(); // pop loading spinner
+
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: CustomText(
+                          'Client deleted successfully!',
+                          color: Colors.white,
+                        ),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: CustomText(
+                          'Failed to delete client.',
+                          color: Colors.white,
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final clientsAsyncValue = ref.watch(clientsListProvider);
@@ -91,7 +186,7 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 28.spMin,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textSecondary,
+                  color: AppColors.primary,
                 ),
               ),
               4.verticalSpace,
@@ -146,8 +241,9 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                           onPressed: () {
                             _searchController.clear();
                             ref
-                                .read(clientsSearchQueryProvider.notifier)
-                                .state = '';
+                                    .read(clientsSearchQueryProvider.notifier)
+                                    .state =
+                                '';
                           },
                         )
                       : null,
@@ -155,8 +251,10 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 14.h,
+                  ),
                 ),
               ),
               24.verticalSpace,
@@ -186,7 +284,9 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                                     height: 150.r,
                                     padding: EdgeInsets.all(20.r),
                                     decoration: BoxDecoration(
-                                      color: AppColors.placeholder.withValues(alpha: 0.3),
+                                      color: AppColors.placeholder.withValues(
+                                        alpha: 0.3,
+                                      ),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Image.asset(
@@ -220,7 +320,9 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                                     Icon(
                                       Icons.search_off_outlined,
                                       size: 64.r,
-                                      color: AppColors.textBody.withValues(alpha: 0.4),
+                                      color: AppColors.textBody.withValues(
+                                        alpha: 0.4,
+                                      ),
                                     ),
                                     16.verticalSpace,
                                     CustomText(
@@ -257,165 +359,183 @@ class _ClientsScreenState extends ConsumerState<ClientsScreen> {
                           final client = filteredClients[index];
                           final initials = _getInitials(client.fullName);
                           final avatarColor = _getAvatarColor(client.fullName);
-                          final avatarTextColor =
-                              _getAvatarTextColor(client.fullName);
+                          final avatarTextColor = _getAvatarTextColor(
+                            client.fullName,
+                          );
 
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.surfaceWhite,
-                              borderRadius: BorderRadius.circular(16.r),
-                              border: Border.all(
-                                color: AppColors.placeholder.withValues(
-                                  alpha: 0.8,
-                                ),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.02),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
+                          return SlidableClientTile(
+                            onDelete: () =>
+                                _confirmDeleteClient(context, ref, client),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceWhite,
                                 borderRadius: BorderRadius.circular(16.r),
-                                onTap: () {
-                                  context.pushNamed(
-                                    AppRoute.clientDetails.name,
-                                    extra: client,
-                                  );
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16.w,
-                                    vertical: 16.h,
+                                border: Border.all(
+                                  color: AppColors.placeholder.withValues(
+                                    alpha: 0.8,
                                   ),
-                                  child: Row(
-                                    children: [
-                                      // Circular image/initials avatar
-                                      Container(
-                                        width: 48.r,
-                                        height: 48.r,
-                                        decoration: BoxDecoration(
-                                          color: avatarColor,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.05,
-                                            ),
-                                            width: 0.5.w,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: CustomText(
-                                            initials,
-                                            style: GoogleFonts.plusJakartaSans(
-                                              fontSize: 16.spMin,
-                                              fontWeight: FontWeight.bold,
-                                              color: avatarTextColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      16.horizontalSpace,
-
-                                      // Client details
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText(
-                                              client.fullName,
-                                              style: GoogleFonts.playfairDisplay(
-                                                fontSize: 18.spMin,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textSecondary,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.02),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  onTap: () {
+                                    context.pushNamed(
+                                      AppRoute.clientDetails.name,
+                                      extra: client,
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16.w,
+                                      vertical: 16.h,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        // Circular image/initials avatar
+                                        Container(
+                                          width: 48.r,
+                                          height: 48.r,
+                                          decoration: BoxDecoration(
+                                            color: avatarColor,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.05,
                                               ),
+                                              width: 0.5.w,
                                             ),
-                                            4.verticalSpace,
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.phone_outlined,
-                                                  size: 14.r,
-                                                  color: AppColors.textBody,
-                                                ),
-                                                6.horizontalSpace,
-                                                CustomText(
-                                                  client.phoneNumber ??
-                                                      'No phone number',
-                                                  style:
-                                                      GoogleFonts.plusJakartaSans(
-                                                    fontSize: 13.spMin,
-                                                    color: AppColors.textBody,
-                                                    fontWeight: FontWeight.w500,
+                                          ),
+                                          child: Center(
+                                            child: CustomText(
+                                              initials,
+                                              style:
+                                                  GoogleFonts.plusJakartaSans(
+                                                    fontSize: 16.spMin,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: avatarTextColor,
                                                   ),
-                                                ),
-                                              ],
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
+                                        16.horizontalSpace,
 
-                                      // Gender Badge
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 10.w,
-                                          vertical: 6.h,
+                                        // Client details
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText(
+                                                client.fullName,
+                                                style:
+                                                    GoogleFonts.playfairDisplay(
+                                                      fontSize: 18.spMin,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: AppColors
+                                                          .textSecondary,
+                                                    ),
+                                              ),
+                                              4.verticalSpace,
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.phone_outlined,
+                                                    size: 14.r,
+                                                    color: AppColors.textBody,
+                                                  ),
+                                                  6.horizontalSpace,
+                                                  CustomText(
+                                                    client.phoneNumber ??
+                                                        'No phone number',
+                                                    style:
+                                                        GoogleFonts.plusJakartaSans(
+                                                          fontSize: 13.spMin,
+                                                          color: AppColors
+                                                              .textBody,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        decoration: BoxDecoration(
-                                          color: client.gender.toLowerCase() ==
-                                                  'male'
-                                              ? AppColors.primary.withValues(
-                                                  alpha: 0.08,
-                                                )
-                                              : Colors.pink.withValues(
-                                                  alpha: 0.08,
-                                                ),
-                                          borderRadius:
-                                              BorderRadius.circular(20.r),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              client.gender.toLowerCase() ==
-                                                      'male'
-                                                  ? Icons.male
-                                                  : Icons.female,
-                                              size: 14.r,
-                                              color: client.gender.toLowerCase() ==
-                                                      'male'
-                                                  ? AppColors.primary
-                                                  : Colors.pink[400],
+
+                                        // Gender Badge
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w,
+                                            vertical: 6.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                client.gender.toLowerCase() ==
+                                                    'male'
+                                                ? AppColors.primary.withValues(
+                                                    alpha: 0.08,
+                                                  )
+                                                : Colors.pink.withValues(
+                                                    alpha: 0.08,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              20.r,
                                             ),
-                                            4.horizontalSpace,
-                                            CustomText(
-                                              client.gender[0].toUpperCase() +
-                                                  client.gender.substring(1),
-                                              style: GoogleFonts.plusJakartaSans(
-                                                fontSize: 12.spMin,
-                                                fontWeight: FontWeight.bold,
-                                                color: client.gender.toLowerCase() ==
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                client.gender.toLowerCase() ==
+                                                        'male'
+                                                    ? Icons.male
+                                                    : Icons.female,
+                                                size: 14.r,
+                                                color:
+                                                    client.gender
+                                                            .toLowerCase() ==
                                                         'male'
                                                     ? AppColors.primary
                                                     : Colors.pink[400],
                                               ),
-                                            ),
-                                          ],
+                                              4.horizontalSpace,
+                                              CustomText(
+                                                client.gender[0].toUpperCase() +
+                                                    client.gender.substring(1),
+                                                style: GoogleFonts.plusJakartaSans(
+                                                  fontSize: 12.spMin,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:
+                                                      client.gender
+                                                              .toLowerCase() ==
+                                                          'male'
+                                                      ? AppColors.primary
+                                                      : Colors.pink[400],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      8.horizontalSpace,
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 14.r,
-                                        color: AppColors.textBody
-                                            .withValues(alpha: 0.5),
-                                      ),
-                                    ],
+                                        8.horizontalSpace,
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 14.r,
+                                          color: AppColors.textBody.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
