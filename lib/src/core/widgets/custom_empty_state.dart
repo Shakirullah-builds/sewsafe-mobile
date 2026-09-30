@@ -13,7 +13,7 @@ class CustomEmptyState extends StatelessWidget {
   final double? titleHeight;
   final double? subtitleHeight;
 
-  // Dual-slot visual system (just like your CustomButton!)
+  // Dual-slot visual system
   final IconData? icon;
   final Widget? imageWidget;
 
@@ -42,7 +42,7 @@ class CustomEmptyState extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 32.w),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Centers it vertically
+        mainAxisAlignment: MainAxisAlignment.center, // Centers vertically
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // 1. The Visual Layer
